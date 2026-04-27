@@ -12,7 +12,10 @@ export class AppComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    this.showSidebar = !this.isAuthRoute(this.router.url);
+    // Check after router has finished initial navigation
+    setTimeout(() => {
+      this.showSidebar = !this.isAuthRoute(this.router.url);
+    }, 0);
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
