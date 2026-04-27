@@ -1,8 +1,10 @@
 .cards-container {
   padding: 2rem;
+  background-color: #0f1419;
+  min-height: 100%;
 }
 
 h1 {
-  color: #333;
+  color: #e5e7eb;
   font-weight: 300;
 }
