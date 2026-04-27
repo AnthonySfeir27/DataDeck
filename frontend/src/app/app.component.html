@@ -1,5 +1,5 @@
-<div class="app-container">
-  <nav class="sidebar">
+<div class="app-container" [class.auth-layout]="!showSidebar">
+  <nav class="sidebar" *ngIf="showSidebar">
     <div class="sidebar-header">
       <h2>DataDeck</h2>
     </div>

@@ -5,6 +5,11 @@
   background-color: #0f1419;
 }
 
+.app-container.auth-layout {
+  justify-content: center;
+  align-items: center;
+}
+
 .sidebar {
   width: 260px;
   background-color: #1a1f2e;
@@ -79,5 +84,9 @@
   flex: 1;
   background-color: #0f1419;
   overflow-y: auto;
+}
+
+.auth-layout .main-content {
+  width: 100%;
 }
 
