@@ -54,14 +54,14 @@ WSGI_APPLICATION = 'datadeck.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'datadeck',
-        'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/')
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# MongoDB connection
+MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/')
+MONGODB_NAME = 'datadeck'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
