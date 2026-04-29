@@ -26,15 +26,34 @@
       </select>
     </div>
     <div class="tag-filter" *ngIf="availableTags.length > 0">
-      <label>Filter by Tags:</label>
-      <div class="tag-filter-list">
-        <button
-          *ngFor="let tag of availableTags"
-          class="tag-filter-btn"
-          [class.active]="isFilterTagSelected(tag.name)"
-          (click)="toggleFilterTag(tag.name)">
-          {{ tag.name }}
+      <div class="tag-filter-header">
+        <label>Filter by Tags:</label>
+        <button class="btn-tag-search" (click)="toggleTagFilterSearch()" [class.active]="showTagFilterSearch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
         </button>
+      </div>
+      <input 
+        *ngIf="showTagFilterSearch"
+        type="text" 
+        placeholder="Search tags..." 
+        [(ngModel)]="tagFilterSearchQuery"
+        (input)="updateFilteredTagsForDisplay()"
+        class="tag-filter-search-input"
+      />
+      <div class="tag-filter-scroll">
+        <div class="tag-filter-list">
+          <button
+            *ngFor="let tag of filteredTagsForDisplay"
+            class="tag-filter-btn"
+            [class.active]="isFilterTagSelected(tag.name)"
+            (click)="toggleFilterTag(tag.name)"
+            [title]="tag.name">
+            {{ truncateTagName(tag.name, 20) }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -81,7 +100,20 @@
 
     <div class="modal-body">
       <div class="form-group">
-        <label for="title">Title</label>
+        <label for="master-tag">Card Type *</label>
+        <select 
+          id="master-tag" 
+          [(ngModel)]="newCard.master_tag"
+          (change)="onMasterTagChange(newCard)"
+          required>
+          <option *ngFor="let mt of masterTags" [value]="mt.id">
+            {{ mt.icon }} {{ mt.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="title">Title *</label>
         <input
           type="text"
           id="title"
@@ -91,32 +123,54 @@
         />
       </div>
 
+      <!-- Task-specific fields -->
+      <div *ngIf="newCard.master_tag === 'task'" class="master-tag-fields">
+        <div class="form-group">
+          <label for="task-deadline">Deadline</label>
+          <input
+            type="datetime-local"
+            id="task-deadline"
+            [(ngModel)]="newCard.master_tag_data.deadline"
+            placeholder="When is this due?"
+          />
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="newCard.master_tag_data.completed"
+            />
+            <span>Mark as completed</span>
+          </label>
+        </div>
+      </div>
+
       <div class="form-group">
         <label>Image</label>
         <div class="image-upload-toggle">
-          <button
+          <button 
             type="button"
-            class="toggle-btn"
+            class="toggle-btn" 
             [class.active]="imageUploadMethod === 'url'"
             (click)="imageUploadMethod = 'url'; newCard.image_data = ''">
             URL
           </button>
-          <button
+          <button 
             type="button"
-            class="toggle-btn"
+            class="toggle-btn" 
             [class.active]="imageUploadMethod === 'file'"
             (click)="imageUploadMethod = 'file'; newCard.image_url = ''">
             Upload File
           </button>
         </div>
-
+        
         <input
           *ngIf="imageUploadMethod === 'url'"
           type="text"
           [(ngModel)]="newCard.image_url"
           placeholder="Enter image URL"
         />
-
+        
         <input
           *ngIf="imageUploadMethod === 'file'"
           type="file"
@@ -146,8 +200,8 @@
           Select Tags ({{ newCard.tags.length }})
         </button>
         <div class="selected-tags-display" *ngIf="newCard.tags.length > 0">
-          <span
-            *ngFor="let tag of newCard.tags"
+          <span 
+            *ngFor="let tag of newCard.tags" 
             class="tag-chip"
             (click)="removeTag(tag, false)">
             {{ tag }}
@@ -245,29 +299,29 @@
       <div class="form-group">
         <label>Image</label>
         <div class="image-upload-toggle">
-          <button
+          <button 
             type="button"
-            class="toggle-btn"
+            class="toggle-btn" 
             [class.active]="editImageUploadMethod === 'url'"
             (click)="editImageUploadMethod = 'url'; editCard.image_data = ''">
             URL
           </button>
-          <button
+          <button 
             type="button"
-            class="toggle-btn"
+            class="toggle-btn" 
             [class.active]="editImageUploadMethod === 'file'"
             (click)="editImageUploadMethod = 'file'; editCard.image_url = ''">
             Upload File
           </button>
         </div>
-
+        
         <input
           *ngIf="editImageUploadMethod === 'url'"
           type="text"
           [(ngModel)]="editCard.image_url"
           placeholder="Enter image URL"
         />
-
+        
         <input
           *ngIf="editImageUploadMethod === 'file'"
           type="file"
@@ -297,8 +351,8 @@
           Select Tags ({{ editCard.tags.length }})
         </button>
         <div class="selected-tags-display" *ngIf="editCard.tags.length > 0">
-          <span
-            *ngFor="let tag of editCard.tags"
+          <span 
+            *ngFor="let tag of editCard.tags" 
             class="tag-chip"
             (click)="removeTag(tag, true)">
             {{ tag }}
@@ -329,25 +383,27 @@
         </svg>
       </button>
     </div>
-
+    
     <div class="tag-selector-search">
-      <input
-        type="text"
-        placeholder="Search tags..."
+      <input 
+        type="text" 
+        placeholder="Search tags..." 
         [(ngModel)]="tagSearchQuery"
+        (input)="updateFilteredTagsForSelector()"
         class="tag-search-input"
       />
     </div>
 
     <div class="tag-selector-grid">
       <button
-        *ngFor="let tag of getFilteredTags()"
+        *ngFor="let tag of filteredTagsForSelector"
         class="tag-selector-item"
         [class.selected]="isTagSelectedInSelector(tag.name)"
-        (click)="toggleTagInSelector(tag.name)">
-        {{ tag.name }}
+        (click)="toggleTagInSelector(tag.name)"
+        [title]="tag.name">
+        {{ truncateTagName(tag.name, 15) }}
       </button>
-      <div class="no-tags" *ngIf="getFilteredTags().length === 0">
+      <div class="no-tags" *ngIf="filteredTagsForSelector.length === 0">
         No tags found
       </div>
     </div>

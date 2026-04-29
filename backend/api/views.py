@@ -114,6 +114,8 @@ def create_card(request):
     master_tag = request.data.get('master_tag')
     image_url = request.data.get('image_url')
     image_data = request.data.get('image_data')
+    urls = request.data.get('urls', [])
+    master_tag_data = request.data.get('master_tag_data', {})
 
     if not title or not user_id:
         return Response(
@@ -131,6 +133,8 @@ def create_card(request):
         'master_tag': master_tag,
         'image_url': image_url,
         'image_data': image_data,
+        'urls': urls,
+        'master_tag_data': master_tag_data,
         'created_at': datetime.utcnow().isoformat(),
         'updated_at': datetime.utcnow().isoformat()
     }
@@ -147,6 +151,8 @@ def create_card(request):
             'master_tag': master_tag,
             'image_url': image_url,
             'image_data': image_data,
+            'urls': urls,
+            'master_tag_data': master_tag_data,
             'created_at': card_data['created_at'],
             'updated_at': card_data['updated_at']
         }
@@ -176,6 +182,8 @@ def get_cards(request):
             'master_tag': card.get('master_tag'),
             'image_url': card.get('image_url'),
             'image_data': card.get('image_data'),
+            'urls': card.get('urls', []),
+            'master_tag_data': card.get('master_tag_data', {}),
             'created_at': card.get('created_at'),
             'updated_at': card.get('updated_at')
         })
@@ -193,6 +201,8 @@ def update_card(request, card_id):
     master_tag = request.data.get('master_tag')
     image_url = request.data.get('image_url')
     image_data = request.data.get('image_data')
+    urls = request.data.get('urls', [])
+    master_tag_data = request.data.get('master_tag_data', {})
 
     if not title:
         return Response(
@@ -209,6 +219,8 @@ def update_card(request, card_id):
         'master_tag': master_tag,
         'image_url': image_url,
         'image_data': image_data,
+        'urls': urls,
+        'master_tag_data': master_tag_data,
         'updated_at': datetime.utcnow().isoformat()
     }
 
@@ -233,6 +245,8 @@ def update_card(request, card_id):
             'master_tag': master_tag,
             'image_url': image_url,
             'image_data': image_data,
+            'urls': urls,
+            'master_tag_data': master_tag_data,
             'updated_at': update_data['updated_at']
         }
     }, status=status.HTTP_200_OK)

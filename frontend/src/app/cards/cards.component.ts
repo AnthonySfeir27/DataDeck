@@ -12,11 +12,18 @@ export class CardsComponent implements OnInit {
   cards: any[] = [];
   filteredCards: any[] = [];
   availableTags: any[] = [];
+  filteredTagsForDisplay: any[] = [];
+  filteredTagsForSelector: any[] = [];
+  masterTags = [
+    { id: 'note', name: 'Note', icon: '📝' },
+    { id: 'task', name: 'Task', icon: '✅' }
+  ];
   showCreateModal: boolean = false;
   showViewModal: boolean = false;
   showEditModal: boolean = false;
   showTagSelectorModal: boolean = false;
   showImageViewerModal: boolean = false;
+  showTagFilterSearch: boolean = false;
   selectedCard: any = null;
   selectedImage: string = '';
   imageUploadMethod: string = 'url';
@@ -25,6 +32,7 @@ export class CardsComponent implements OnInit {
   searchQuery: string = '';
   searchFilter: string = 'all';
   selectedFilterTags: string[] = [];
+  tagFilterSearchQuery: string = '';
   tagSearchQuery: string = '';
   tempSelectedTags: string[] = [];
   newCard = {
@@ -33,7 +41,9 @@ export class CardsComponent implements OnInit {
     image_url: '',
     image_data: '',
     tags: [] as string[],
-    master_tag: null
+    master_tag: '',
+    urls: [] as string[],
+    master_tag_data: {} as any
   };
   editCard = {
     id: '',
@@ -42,7 +52,9 @@ export class CardsComponent implements OnInit {
     image_url: '',
     image_data: '',
     tags: [] as string[],
-    master_tag: null
+    master_tag: '',
+    urls: [] as string[],
+    master_tag_data: {} as any
   };
 
   constructor(
@@ -52,40 +64,89 @@ export class CardsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('[Cards] Component initializing...');
     this.loadCards();
     this.loadTags();
+    console.log('[Cards] Component initialized');
   }
 
   loadCards(): void {
+    console.log('[Cards] Loading cards...');
     const user = this.authService.getCurrentUser();
     if (user) {
+      console.log('[Cards] User found:', user.id);
       this.cardsService.getCards(user.id).subscribe({
         next: (response) => {
+          console.log('[Cards] Cards loaded:', response.cards.length);
           this.cards = response.cards;
           this.applyFilters();
         },
         error: (error) => {
-          console.error('Error loading cards:', error);
+          console.error('[Cards] Error loading cards:', error);
         }
       });
+    } else {
+      console.log('[Cards] No user found');
     }
   }
 
   loadTags(): void {
+    console.log('[Cards] Loading tags...');
     const user = this.authService.getCurrentUser();
     if (user) {
+      console.log('[Cards] User found for tags:', user.id);
       this.tagsService.getTags(user.id).subscribe({
         next: (response) => {
+          console.log('[Cards] Tags loaded:', response.tags.length);
           this.availableTags = response.tags;
+          this.filteredTagsForDisplay = [...this.availableTags];
+          console.log('[Cards] filteredTagsForDisplay set:', this.filteredTagsForDisplay.length);
         },
         error: (error) => {
-          console.error('Error loading tags:', error);
+          console.error('[Cards] Error loading tags:', error);
         }
       });
+    } else {
+      console.log('[Cards] No user found for tags');
     }
   }
 
+  updateFilteredTagsForDisplay(): void {
+    console.log('[Cards] Updating filtered tags for display, query:', this.tagFilterSearchQuery);
+    if (!this.tagFilterSearchQuery.trim()) {
+      this.filteredTagsForDisplay = [...this.availableTags];
+    } else {
+      const query = this.tagFilterSearchQuery.toLowerCase();
+      this.filteredTagsForDisplay = this.availableTags.filter(tag => 
+        tag.name.toLowerCase().includes(query)
+      );
+    }
+    console.log('[Cards] Filtered tags for display:', this.filteredTagsForDisplay.length);
+  }
+
+  toggleTagFilterSearch(): void {
+    console.log('[Cards] Toggling tag filter search');
+    this.showTagFilterSearch = !this.showTagFilterSearch;
+    if (!this.showTagFilterSearch) {
+      this.tagFilterSearchQuery = '';
+      this.filteredTagsForDisplay = [...this.availableTags];
+    }
+    console.log('[Cards] Tag filter search visible:', this.showTagFilterSearch);
+  }
+
+  truncateTagName(name: string, maxLength: number = 20): string {
+    if (!name) {
+      console.warn('[Cards] truncateTagName called with empty name');
+      return '';
+    }
+    if (name.length <= maxLength) {
+      return name;
+    }
+    return name.substring(0, maxLength) + '...';
+  }
+
   applyFilters(): void {
+    console.log('[Cards] Applying filters...');
     let filtered = [...this.cards];
 
     // Apply search filter
@@ -112,6 +173,7 @@ export class CardsComponent implements OnInit {
     }
 
     this.filteredCards = filtered;
+    console.log('[Cards] Filtered cards:', this.filteredCards.length);
   }
 
   toggleFilterTag(tagName: string): void {
@@ -136,14 +198,17 @@ export class CardsComponent implements OnInit {
     this.applyFilters();
   }
 
-  getFilteredTags(): any[] {
+  updateFilteredTagsForSelector(): void {
+    console.log('[Cards] Updating filtered tags for selector, query:', this.tagSearchQuery);
     if (!this.tagSearchQuery.trim()) {
-      return this.availableTags;
+      this.filteredTagsForSelector = [...this.availableTags];
+    } else {
+      const query = this.tagSearchQuery.toLowerCase();
+      this.filteredTagsForSelector = this.availableTags.filter(tag => 
+        tag.name.toLowerCase().includes(query)
+      );
     }
-    const query = this.tagSearchQuery.toLowerCase();
-    return this.availableTags.filter(tag => 
-      tag.name.toLowerCase().includes(query)
-    );
+    console.log('[Cards] Filtered tags for selector:', this.filteredTagsForSelector.length);
   }
 
   onCardClick(card: any): void {
@@ -170,6 +235,8 @@ export class CardsComponent implements OnInit {
   openCreateModal(): void {
     this.showCreateModal = true;
     this.imageUploadMethod = 'url';
+    this.newCard.master_tag = 'note';
+    this.initializeMasterTagData(this.newCard);
   }
 
   closeCreateModal(): void {
@@ -180,7 +247,9 @@ export class CardsComponent implements OnInit {
       image_url: '',
       image_data: '',
       tags: [],
-      master_tag: null
+      master_tag: '',
+      urls: [],
+      master_tag_data: {}
     };
     this.imageUploadMethod = 'url';
   }
@@ -198,7 +267,9 @@ export class CardsComponent implements OnInit {
       image_url: this.selectedCard.image_url || '',
       image_data: this.selectedCard.image_data || '',
       tags: [...(this.selectedCard.tags || [])],
-      master_tag: this.selectedCard.master_tag
+      master_tag: this.selectedCard.master_tag || 'note',
+      urls: [...(this.selectedCard.urls || [])],
+      master_tag_data: JSON.parse(JSON.stringify(this.selectedCard.master_tag_data || {}))
     };
     this.editImageUploadMethod = this.selectedCard.image_data ? 'file' : 'url';
     this.showViewModal = false;
@@ -214,7 +285,9 @@ export class CardsComponent implements OnInit {
       image_url: '',
       image_data: '',
       tags: [],
-      master_tag: null
+      master_tag: '',
+      urls: [],
+      master_tag_data: {}
     };
     this.editImageUploadMethod = 'url';
   }
@@ -223,6 +296,7 @@ export class CardsComponent implements OnInit {
     this.isEditingCard = isEdit;
     this.tempSelectedTags = isEdit ? [...this.editCard.tags] : [...this.newCard.tags];
     this.tagSearchQuery = '';
+    this.filteredTagsForSelector = [...this.availableTags];
     this.showTagSelectorModal = true;
   }
 
@@ -230,6 +304,7 @@ export class CardsComponent implements OnInit {
     this.showTagSelectorModal = false;
     this.tagSearchQuery = '';
     this.tempSelectedTags = [];
+    this.filteredTagsForSelector = [];
   }
 
   toggleTagInSelector(tagName: string): void {
@@ -285,8 +360,29 @@ export class CardsComponent implements OnInit {
     }
   }
 
+  initializeMasterTagData(card: any): void {
+    if (card.master_tag === 'task') {
+      card.master_tag_data = {
+        deadline: '',
+        completed: false
+      };
+    } else {
+      card.master_tag_data = {};
+    }
+  }
+
+  onMasterTagChange(card: any): void {
+    this.initializeMasterTagData(card);
+  }
+
   createCard(): void {
     if (!this.newCard.title.trim()) {
+      alert('Title is required');
+      return;
+    }
+
+    if (!this.newCard.master_tag) {
+      alert('Please select a card type');
       return;
     }
 
@@ -298,6 +394,8 @@ export class CardsComponent implements OnInit {
       description: this.newCard.description,
       tags: this.newCard.tags,
       master_tag: this.newCard.master_tag,
+      urls: this.newCard.urls,
+      master_tag_data: this.newCard.master_tag_data,
       user_id: user.id
     };
 
@@ -316,13 +414,20 @@ export class CardsComponent implements OnInit {
         this.closeCreateModal();
       },
       error: (error) => {
-        console.error('Error creating card:', error);
+        console.error('[Cards] Error creating card:', error);
+        alert('Error creating card');
       }
     });
   }
 
   updateCard(): void {
     if (!this.editCard.title.trim()) {
+      alert('Title is required');
+      return;
+    }
+
+    if (!this.editCard.master_tag) {
+      alert('Please select a card type');
       return;
     }
 
@@ -330,7 +435,9 @@ export class CardsComponent implements OnInit {
       title: this.editCard.title,
       description: this.editCard.description,
       tags: this.editCard.tags,
-      master_tag: this.editCard.master_tag
+      master_tag: this.editCard.master_tag,
+      urls: this.editCard.urls,
+      master_tag_data: this.editCard.master_tag_data
     };
 
     if (this.editImageUploadMethod === 'url') {
@@ -351,7 +458,8 @@ export class CardsComponent implements OnInit {
         this.closeEditModal();
       },
       error: (error) => {
-        console.error('Error updating card:', error);
+        console.error('[Cards] Error updating card:', error);
+        alert('Error updating card');
       }
     });
   }
@@ -380,3 +488,8 @@ export class CardsComponent implements OnInit {
     return card.image_url || '';
   }
 }
+
+
+
+
+
