@@ -11,8 +11,12 @@ import { SettingsComponent } from './settings/settings.component';
 import { AccountComponent } from './account/account.component';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
+import { TagsComponent } from './tags/tags.component';
+import { CardComponent } from './card/card.component';
 import { WelcomeService } from './services/welcome.service';
 import { AuthService } from './services/auth.service';
+import { CardsService } from './services/cards.service';
+import { TagsService } from './services/tags.service';
 
 @NgModule({
   declarations: [
@@ -22,7 +26,9 @@ import { AuthService } from './services/auth.service';
     SettingsComponent,
     AccountComponent,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    TagsComponent,
+    CardComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +36,7 @@ import { AuthService } from './services/auth.service';
     FormsModule,
     AppRoutingModule
   ],
-  providers: [WelcomeService, AuthService],
+  providers: [WelcomeService, AuthService, CardsService, TagsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

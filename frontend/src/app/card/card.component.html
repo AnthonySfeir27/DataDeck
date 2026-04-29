@@ -1,0 +1,18 @@
+<div class="card" (click)="onCardClick()">
+  <div class="card-image" *ngIf="card.image_url || card.image_data">
+    <img [src]="getImageSource()" [alt]="card.title" />
+  </div>
+  <div class="card-content">
+    <h3 class="card-title">{{ card.title }}</h3>
+    <p class="card-description" [class.full-height]="!card.image_url && !card.image_data">
+      {{ card.description }}
+    </p>
+  </div>
+  <div class="card-footer">
+    <div class="card-tags" *ngIf="card.tags && card.tags.length > 0">
+      <span class="tag" *ngFor="let tag of card.tags.slice(0, 3)">{{ tag }}</span>
+      <span class="tag-more" *ngIf="card.tags.length > 3">+{{ card.tags.length - 3 }}</span>
+    </div>
+    <span class="master-tag" *ngIf="card.master_tag">{{ card.master_tag }}</span>
+  </div>
+</div>

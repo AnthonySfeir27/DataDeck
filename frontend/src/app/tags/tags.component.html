@@ -1,0 +1,67 @@
+<div class="tags-container">
+  <div class="tags-header">
+    <h1>Tags</h1>
+    <button class="btn-create" (click)="openCreateModal()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14m-7-7h14"></path>
+      </svg>
+      Create Tag
+    </button>
+  </div>
+
+  <div class="tags-grid" *ngIf="tags.length > 0">
+    <div class="tag-card" *ngFor="let tag of tags">
+      <div class="tag-content">
+        <h3>{{ tag.name }}</h3>
+      </div>
+      <button class="btn-delete-tag" (click)="deleteTag(tag.id)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="tags.length === 0">
+    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+      <line x1="7" y1="7" x2="7.01" y2="7"></line>
+    </svg>
+    <h2>No tags yet</h2>
+    <p>Create your first tag to organize your cards</p>
+  </div>
+</div>
+
+<!-- Create Tag Modal -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Tag</h2>
+      <button class="btn-close" (click)="closeCreateModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="tag-name">Tag Name</label>
+        <input
+          type="text"
+          id="tag-name"
+          [(ngModel)]="newTagName"
+          placeholder="Enter tag name"
+          required
+        />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeCreateModal()">Cancel</button>
+      <button class="btn-primary" (click)="createTag()">Create</button>
+    </div>
+  </div>
+</div>
+
