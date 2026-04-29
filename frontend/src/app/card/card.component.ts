@@ -9,8 +9,12 @@ export class CardComponent implements OnInit, OnChanges {
   @Input() card: any;
   @Output() cardClick = new EventEmitter<any>();
   @Output() imageClick = new EventEmitter<string>();
-
+  
   imageSource: string = '';
+  masterTags = [
+    { id: 'note', icon: '📝' },
+    { id: 'task', icon: '✅' }
+  ];
 
   ngOnInit(): void {
     this.updateImageSource();
@@ -39,5 +43,10 @@ export class CardComponent implements OnInit, OnChanges {
     if (this.imageSource) {
       this.imageClick.emit(this.imageSource);
     }
+  }
+
+  getMasterTagIcon(masterTagId: string): string {
+    const tag = this.masterTags.find(mt => mt.id === masterTagId);
+    return tag ? tag.icon : '';
   }
 }

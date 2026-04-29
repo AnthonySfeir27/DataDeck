@@ -1,9 +1,27 @@
 <div class="card" (click)="onCardClick()">
+  <div class="card-dates">
+    <span>{{ card.created_at | date:'short' }}</span>
+  </div>
+  
   <div class="card-image" *ngIf="card.image_url || card.image_data" (click)="onImageClick($event)">
     <img [src]="imageSource" [alt]="card.title" />
   </div>
   <div class="card-content">
     <h3 class="card-title">{{ card.title }}</h3>
+    
+    <!-- Task status -->
+    <div class="card-task-status" *ngIf="card.master_tag === 'task'">
+      <span class="task-badge" [class.completed]="card.master_tag_data?.completed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        {{ card.master_tag_data?.completed ? 'Done' : 'Todo' }}
+      </span>
+      <span class="task-deadline" *ngIf="card.master_tag_data?.deadline">
+        📅 {{ card.master_tag_data.deadline | date:'short' }}
+      </span>
+    </div>
+    
     <p class="card-description" [class.full-height]="!card.image_url && !card.image_data">
       {{ card.description }}
     </p>
@@ -13,6 +31,6 @@
       <span class="tag" *ngFor="let tag of card.tags.slice(0, 3)">{{ tag }}</span>
       <span class="tag-more" *ngIf="card.tags.length > 3">+{{ card.tags.length - 3 }}</span>
     </div>
-    <span class="master-tag" *ngIf="card.master_tag">{{ card.master_tag }}</span>
+    <span class="master-tag" *ngIf="card.master_tag">{{ getMasterTagIcon(card.master_tag) }}</span>
   </div>
 </div>
