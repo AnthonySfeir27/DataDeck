@@ -1,5 +1,5 @@
 <div class="card" (click)="onCardClick()">
-  <div class="card-image" *ngIf="card.image_url || card.image_data">
+  <div class="card-image" *ngIf="card.image_url || card.image_data" (click)="onImageClick($event)">
     <img [src]="getImageSource()" [alt]="card.title" />
   </div>
   <div class="card-content">

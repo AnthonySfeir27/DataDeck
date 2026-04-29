@@ -9,17 +9,61 @@
     </button>
   </div>
 
-  <div class="cards-grid" *ngIf="cards.length > 0">
-    <app-card *ngFor="let card of cards" [card]="card" (cardClick)="onCardClick($event)"></app-card>
+  <!-- Search and Filter -->
+  <div class="search-filter-container">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="Search cards..." 
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+        class="search-input"
+      />
+      <select [(ngModel)]="searchFilter" (change)="onFilterChange()" class="filter-select">
+        <option value="all">All Fields</option>
+        <option value="title">Title Only</option>
+        <option value="description">Description Only</option>
+      </select>
+    </div>
+    <div class="tag-filter" *ngIf="availableTags.length > 0">
+      <label>Filter by Tags:</label>
+      <div class="tag-filter-list">
+        <button
+          *ngFor="let tag of availableTags"
+          class="tag-filter-btn"
+          [class.active]="isFilterTagSelected(tag.name)"
+          (click)="toggleFilterTag(tag.name)">
+          {{ tag.name }}
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="empty-state" *ngIf="cards.length === 0">
+  <div class="cards-grid" *ngIf="filteredCards.length > 0">
+    <app-card 
+      *ngFor="let card of filteredCards" 
+      [card]="card" 
+      (cardClick)="onCardClick($event)"
+      (imageClick)="onImageClickFromCard($event)">
+    </app-card>
+  </div>
+
+  <div class="empty-state" *ngIf="filteredCards.length === 0 && cards.length === 0">
     <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M21 16V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"></path>
       <polyline points="7 10 12 13 17 10"></polyline>
     </svg>
     <h2>No cards yet</h2>
     <p>Create your first card to get started</p>
+  </div>
+
+  <div class="empty-state" *ngIf="filteredCards.length === 0 && cards.length > 0">
+    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="m21 21-4.35-4.35"></path>
+    </svg>
+    <h2>No cards found</h2>
+    <p>Try adjusting your search or filters</p>
   </div>
 </div>
 
@@ -50,29 +94,29 @@
       <div class="form-group">
         <label>Image</label>
         <div class="image-upload-toggle">
-          <button 
+          <button
             type="button"
-            class="toggle-btn" 
+            class="toggle-btn"
             [class.active]="imageUploadMethod === 'url'"
             (click)="imageUploadMethod = 'url'; newCard.image_data = ''">
             URL
           </button>
-          <button 
+          <button
             type="button"
-            class="toggle-btn" 
+            class="toggle-btn"
             [class.active]="imageUploadMethod === 'file'"
             (click)="imageUploadMethod = 'file'; newCard.image_url = ''">
             Upload File
           </button>
         </div>
-        
+
         <input
           *ngIf="imageUploadMethod === 'url'"
           type="text"
           [(ngModel)]="newCard.image_url"
           placeholder="Enter image URL"
         />
-        
+
         <input
           *ngIf="imageUploadMethod === 'file'"
           type="file"
@@ -92,17 +136,26 @@
         ></textarea>
       </div>
 
-      <div class="form-group" *ngIf="availableTags.length > 0">
+      <div class="form-group">
         <label>Tags</label>
-        <div class="tag-selection">
-          <button
-            type="button"
-            *ngFor="let tag of availableTags"
-            class="tag-select-btn"
-            [class.selected]="isTagSelected(tag.name, false)"
-            (click)="toggleTag(tag.name, false)">
-            {{ tag.name }}
-          </button>
+        <button type="button" class="btn-select-tags" (click)="openTagSelector(false)">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          Select Tags ({{ newCard.tags.length }})
+        </button>
+        <div class="selected-tags-display" *ngIf="newCard.tags.length > 0">
+          <span
+            *ngFor="let tag of newCard.tags"
+            class="tag-chip"
+            (click)="removeTag(tag, false)">
+            {{ tag }}
+            <svg class="remove-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </span>
         </div>
       </div>
     </div>
@@ -127,7 +180,7 @@
     </div>
 
     <div class="modal-body modal-body-scrollable">
-      <div class="view-image" *ngIf="selectedCard?.image_url || selectedCard?.image_data">
+      <div class="view-image" *ngIf="selectedCard?.image_url || selectedCard?.image_data" (click)="onImageClick($event, getImageSource(selectedCard))">
         <img [src]="getImageSource(selectedCard)" [alt]="selectedCard.title" />
       </div>
       <div class="view-section" *ngIf="selectedCard?.description">
@@ -192,29 +245,29 @@
       <div class="form-group">
         <label>Image</label>
         <div class="image-upload-toggle">
-          <button 
+          <button
             type="button"
-            class="toggle-btn" 
+            class="toggle-btn"
             [class.active]="editImageUploadMethod === 'url'"
             (click)="editImageUploadMethod = 'url'; editCard.image_data = ''">
             URL
           </button>
-          <button 
+          <button
             type="button"
-            class="toggle-btn" 
+            class="toggle-btn"
             [class.active]="editImageUploadMethod === 'file'"
             (click)="editImageUploadMethod = 'file'; editCard.image_url = ''">
             Upload File
           </button>
         </div>
-        
+
         <input
           *ngIf="editImageUploadMethod === 'url'"
           type="text"
           [(ngModel)]="editCard.image_url"
           placeholder="Enter image URL"
         />
-        
+
         <input
           *ngIf="editImageUploadMethod === 'file'"
           type="file"
@@ -234,17 +287,26 @@
         ></textarea>
       </div>
 
-      <div class="form-group" *ngIf="availableTags.length > 0">
+      <div class="form-group">
         <label>Tags</label>
-        <div class="tag-selection">
-          <button
-            type="button"
-            *ngFor="let tag of availableTags"
-            class="tag-select-btn"
-            [class.selected]="isTagSelected(tag.name, true)"
-            (click)="toggleTag(tag.name, true)">
-            {{ tag.name }}
-          </button>
+        <button type="button" class="btn-select-tags" (click)="openTagSelector(true)">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          Select Tags ({{ editCard.tags.length }})
+        </button>
+        <div class="selected-tags-display" *ngIf="editCard.tags.length > 0">
+          <span
+            *ngFor="let tag of editCard.tags"
+            class="tag-chip"
+            (click)="removeTag(tag, true)">
+            {{ tag }}
+            <svg class="remove-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </span>
         </div>
       </div>
     </div>
@@ -253,5 +315,58 @@
       <button class="btn-cancel" (click)="closeEditModal()">Cancel</button>
       <button class="btn-primary" (click)="updateCard()">Save Changes</button>
     </div>
+  </div>
+</div>
+
+<!-- Tag Selector Modal -->
+<div class="modal-overlay" *ngIf="showTagSelectorModal" (click)="closeTagSelector()">
+  <div class="tag-selector-panel" (click)="$event.stopPropagation()">
+    <div class="tag-selector-header">
+      <h3>Select Tags</h3>
+      <button class="btn-close-small" (click)="closeTagSelector()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="tag-selector-search">
+      <input
+        type="text"
+        placeholder="Search tags..."
+        [(ngModel)]="tagSearchQuery"
+        class="tag-search-input"
+      />
+    </div>
+
+    <div class="tag-selector-grid">
+      <button
+        *ngFor="let tag of getFilteredTags()"
+        class="tag-selector-item"
+        [class.selected]="isTagSelectedInSelector(tag.name)"
+        (click)="toggleTagInSelector(tag.name)">
+        {{ tag.name }}
+      </button>
+      <div class="no-tags" *ngIf="getFilteredTags().length === 0">
+        No tags found
+      </div>
+    </div>
+
+    <div class="tag-selector-footer">
+      <button class="btn-cancel" (click)="closeTagSelector()">Cancel</button>
+      <button class="btn-primary" (click)="applyTagSelection()">Apply ({{ tempSelectedTags.length }})</button>
+    </div>
+  </div>
+</div>
+
+<!-- Image Viewer Modal -->
+<div class="modal-overlay" *ngIf="showImageViewerModal" (click)="closeImageViewer()">
+  <div class="image-viewer-content" (click)="$event.stopPropagation()">
+    <button class="btn-close-viewer" (click)="closeImageViewer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+    <img [src]="selectedImage" alt="Full size image" />
   </div>
 </div>

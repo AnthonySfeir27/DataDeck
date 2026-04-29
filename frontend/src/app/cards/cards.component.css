@@ -8,13 +8,350 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
   color: #e5e7eb;
   font-weight: 600;
   margin: 0;
+}
+
+/* Search and Filter */
+.search-filter-container {
+  margin-bottom: 2rem;
+}
+
+.search-box {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  flex: 1;
+  background-color: #1a1f2e;
+  border: 1px solid #2a3141;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #60a5fa;
+}
+
+.search-input::placeholder {
+  color: #6b7280;
+}
+
+.filter-select {
+  background-color: #1a1f2e;
+  border: 1px solid #2a3141;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #60a5fa;
+}
+
+.tag-filter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tag-filter label {
+  color: #9ca3af;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tag-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-filter-btn {
+  background-color: #1a1f2e;
+  color: #9ca3af;
+  border: 1px solid #2a3141;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-filter-btn:hover {
+  background-color: #2a3141;
+  border-color: #4b5563;
+}
+
+.tag-filter-btn.active {
+  background-color: #1e3a5f;
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+/* Tag Selector Panel */
+.tag-selector-panel {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #1a1f2e;
+  border: 1px solid #2a3141;
+  border-radius: 12px;
+  width: 400px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.tag-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #2a3141;
+}
+
+.tag-selector-header h3 {
+  color: #e5e7eb;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.btn-close-small {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  transition: color 0.2s ease;
+}
+
+.btn-close-small:hover {
+  color: #e5e7eb;
+}
+
+.btn-close-small svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tag-selector-search {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #2a3141;
+}
+
+.tag-search-input {
+  width: 100%;
+  background-color: #0f1419;
+  border: 1px solid #2a3141;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.tag-search-input:focus {
+  outline: none;
+  border-color: #60a5fa;
+}
+
+.tag-search-input::placeholder {
+  color: #6b7280;
+}
+
+.tag-selector-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  max-height: 350px;
+}
+
+.tag-selector-item {
+  background-color: #0f1419;
+  color: #9ca3af;
+  border: 1px solid #2a3141;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag-selector-item:hover {
+  background-color: #1a1f2e;
+  border-color: #4b5563;
+}
+
+.tag-selector-item.selected {
+  background-color: #1e3a5f;
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+.no-tags {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #6b7280;
+  padding: 2rem;
+  font-size: 0.9rem;
+}
+
+.tag-selector-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid #2a3141;
+}
+
+.btn-select-tags {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #1a1f2e;
+  color: #9ca3af;
+  border: 1px solid #2a3141;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-select-tags:hover {
+  background-color: #2a3141;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+.btn-select-tags .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.selected-tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.tag-chip {
+  background-color: #1e3a5f;
+  color: #60a5fa;
+  border: 1px solid #60a5fa;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.tag-chip:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.tag-chip .remove-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Image Viewer */
+.image-viewer-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-viewer-content img {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.btn-close-viewer {
+  position: absolute;
+  top: -3rem;
+  right: 0;
+  background-color: #1a1f2e;
+  border: 1px solid #2a3141;
+  color: #e5e7eb;
+  cursor: pointer;
+  padding: 0.75rem;
+  display: flex;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-close-viewer:hover {
+  background-color: #2a3141;
+}
+
+.btn-close-viewer svg {
+  width: 20px;
+  height: 20px;
+}
+
+.view-image {
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0f1419;
+}
+
+.view-image img {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
 }
 
 .btn-create {

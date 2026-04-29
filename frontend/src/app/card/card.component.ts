@@ -8,9 +8,18 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class CardComponent {
   @Input() card: any;
   @Output() cardClick = new EventEmitter<any>();
+  @Output() imageClick = new EventEmitter<string>();
 
   onCardClick(): void {
     this.cardClick.emit(this.card);
+  }
+
+  onImageClick(event: Event): void {
+    event.stopPropagation();
+    const imageSource = this.getImageSource();
+    if (imageSource) {
+      this.imageClick.emit(imageSource);
+    }
   }
 
   getImageSource(): string {

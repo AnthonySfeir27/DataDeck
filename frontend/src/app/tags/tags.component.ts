@@ -9,8 +9,10 @@ import { AuthService } from '../services/auth.service';
 })
 export class TagsComponent implements OnInit {
   tags: any[] = [];
+  filteredTags: any[] = [];
   showCreateModal: boolean = false;
   newTagName: string = '';
+  searchQuery: string = '';
 
   constructor(
     private tagsService: TagsService,
@@ -27,12 +29,28 @@ export class TagsComponent implements OnInit {
       this.tagsService.getTags(user.id).subscribe({
         next: (response) => {
           this.tags = response.tags;
+          this.applySearch();
         },
         error: (error) => {
           console.error('Error loading tags:', error);
         }
       });
     }
+  }
+
+  applySearch(): void {
+    if (!this.searchQuery.trim()) {
+      this.filteredTags = [...this.tags];
+    } else {
+      const query = this.searchQuery.toLowerCase();
+      this.filteredTags = this.tags.filter(tag => 
+        tag.name.toLowerCase().includes(query)
+      );
+    }
+  }
+
+  onSearchChange(): void {
+    this.applySearch();
   }
 
   openCreateModal(): void {
@@ -58,6 +76,7 @@ export class TagsComponent implements OnInit {
     }).subscribe({
       next: (response) => {
         this.tags.push(response.tag);
+        this.applySearch();
         this.closeCreateModal();
       },
       error: (error) => {
@@ -72,6 +91,7 @@ export class TagsComponent implements OnInit {
       this.tagsService.deleteTag(tagId).subscribe({
         next: () => {
           this.tags = this.tags.filter(t => t.id !== tagId);
+          this.applySearch();
         },
         error: (error) => {
           console.error('Error deleting tag:', error);
@@ -80,4 +100,5 @@ export class TagsComponent implements OnInit {
     }
   }
 }
+
 

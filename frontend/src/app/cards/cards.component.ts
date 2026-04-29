@@ -10,13 +10,23 @@ import { TagsService } from '../services/tags.service';
 })
 export class CardsComponent implements OnInit {
   cards: any[] = [];
+  filteredCards: any[] = [];
   availableTags: any[] = [];
   showCreateModal: boolean = false;
   showViewModal: boolean = false;
   showEditModal: boolean = false;
+  showTagSelectorModal: boolean = false;
+  showImageViewerModal: boolean = false;
   selectedCard: any = null;
+  selectedImage: string = '';
   imageUploadMethod: string = 'url';
   editImageUploadMethod: string = 'url';
+  isEditingCard: boolean = false;
+  searchQuery: string = '';
+  searchFilter: string = 'all';
+  selectedFilterTags: string[] = [];
+  tagSearchQuery: string = '';
+  tempSelectedTags: string[] = [];
   newCard = {
     title: '',
     description: '',
@@ -52,6 +62,7 @@ export class CardsComponent implements OnInit {
       this.cardsService.getCards(user.id).subscribe({
         next: (response) => {
           this.cards = response.cards;
+          this.applyFilters();
         },
         error: (error) => {
           console.error('Error loading cards:', error);
@@ -74,9 +85,86 @@ export class CardsComponent implements OnInit {
     }
   }
 
+  applyFilters(): void {
+    let filtered = [...this.cards];
+
+    // Apply search filter
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(card => {
+        if (this.searchFilter === 'all') {
+          return card.title.toLowerCase().includes(query) ||
+                 card.description.toLowerCase().includes(query);
+        } else if (this.searchFilter === 'title') {
+          return card.title.toLowerCase().includes(query);
+        } else if (this.searchFilter === 'description') {
+          return card.description.toLowerCase().includes(query);
+        }
+        return true;
+      });
+    }
+
+    // Apply tag filter
+    if (this.selectedFilterTags.length > 0) {
+      filtered = filtered.filter(card => {
+        return this.selectedFilterTags.every(tag => card.tags.includes(tag));
+      });
+    }
+
+    this.filteredCards = filtered;
+  }
+
+  toggleFilterTag(tagName: string): void {
+    const index = this.selectedFilterTags.indexOf(tagName);
+    if (index > -1) {
+      this.selectedFilterTags.splice(index, 1);
+    } else {
+      this.selectedFilterTags.push(tagName);
+    }
+    this.applyFilters();
+  }
+
+  isFilterTagSelected(tagName: string): boolean {
+    return this.selectedFilterTags.includes(tagName);
+  }
+
+  onSearchChange(): void {
+    this.applyFilters();
+  }
+
+  onFilterChange(): void {
+    this.applyFilters();
+  }
+
+  getFilteredTags(): any[] {
+    if (!this.tagSearchQuery.trim()) {
+      return this.availableTags;
+    }
+    const query = this.tagSearchQuery.toLowerCase();
+    return this.availableTags.filter(tag => 
+      tag.name.toLowerCase().includes(query)
+    );
+  }
+
   onCardClick(card: any): void {
     this.selectedCard = card;
     this.showViewModal = true;
+  }
+
+  onImageClickFromCard(imageSource: string): void {
+    this.selectedImage = imageSource;
+    this.showImageViewerModal = true;
+  }
+
+  onImageClick(event: Event, imageSource: string): void {
+    event.stopPropagation();
+    this.selectedImage = imageSource;
+    this.showImageViewerModal = true;
+  }
+
+  closeImageViewer(): void {
+    this.showImageViewerModal = false;
+    this.selectedImage = '';
   }
 
   openCreateModal(): void {
@@ -109,7 +197,7 @@ export class CardsComponent implements OnInit {
       description: this.selectedCard.description,
       image_url: this.selectedCard.image_url || '',
       image_data: this.selectedCard.image_data || '',
-      tags: this.selectedCard.tags || [],
+      tags: [...(this.selectedCard.tags || [])],
       master_tag: this.selectedCard.master_tag
     };
     this.editImageUploadMethod = this.selectedCard.image_data ? 'file' : 'url';
@@ -131,6 +219,55 @@ export class CardsComponent implements OnInit {
     this.editImageUploadMethod = 'url';
   }
 
+  openTagSelector(isEdit: boolean = false): void {
+    this.isEditingCard = isEdit;
+    this.tempSelectedTags = isEdit ? [...this.editCard.tags] : [...this.newCard.tags];
+    this.tagSearchQuery = '';
+    this.showTagSelectorModal = true;
+  }
+
+  closeTagSelector(): void {
+    this.showTagSelectorModal = false;
+    this.tagSearchQuery = '';
+    this.tempSelectedTags = [];
+  }
+
+  toggleTagInSelector(tagName: string): void {
+    const index = this.tempSelectedTags.indexOf(tagName);
+    if (index > -1) {
+      this.tempSelectedTags.splice(index, 1);
+    } else {
+      this.tempSelectedTags.push(tagName);
+    }
+  }
+
+  isTagSelectedInSelector(tagName: string): boolean {
+    return this.tempSelectedTags.includes(tagName);
+  }
+
+  applyTagSelection(): void {
+    if (this.isEditingCard) {
+      this.editCard.tags = [...this.tempSelectedTags];
+    } else {
+      this.newCard.tags = [...this.tempSelectedTags];
+    }
+    this.closeTagSelector();
+  }
+
+  removeTag(tagName: string, isEdit: boolean = false): void {
+    if (isEdit) {
+      const index = this.editCard.tags.indexOf(tagName);
+      if (index > -1) {
+        this.editCard.tags.splice(index, 1);
+      }
+    } else {
+      const index = this.newCard.tags.indexOf(tagName);
+      if (index > -1) {
+        this.newCard.tags.splice(index, 1);
+      }
+    }
+  }
+
   onFileSelected(event: any, isEdit: boolean = false): void {
     const file = event.target.files[0];
     if (file) {
@@ -146,31 +283,6 @@ export class CardsComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     }
-  }
-
-  toggleTag(tagName: string, isEdit: boolean = false): void {
-    if (isEdit) {
-      const index = this.editCard.tags.indexOf(tagName);
-      if (index > -1) {
-        this.editCard.tags.splice(index, 1);
-      } else {
-        this.editCard.tags.push(tagName);
-      }
-    } else {
-      const index = this.newCard.tags.indexOf(tagName);
-      if (index > -1) {
-        this.newCard.tags.splice(index, 1);
-      } else {
-        this.newCard.tags.push(tagName);
-      }
-    }
-  }
-
-  isTagSelected(tagName: string, isEdit: boolean = false): boolean {
-    if (isEdit) {
-      return this.editCard.tags.includes(tagName);
-    }
-    return this.newCard.tags.includes(tagName);
   }
 
   createCard(): void {
@@ -200,6 +312,7 @@ export class CardsComponent implements OnInit {
     this.cardsService.createCard(cardData).subscribe({
       next: (response) => {
         this.cards.push(response.card);
+        this.applyFilters();
         this.closeCreateModal();
       },
       error: (error) => {
@@ -234,6 +347,7 @@ export class CardsComponent implements OnInit {
         if (index !== -1) {
           this.cards[index] = { ...this.cards[index], ...response.card };
         }
+        this.applyFilters();
         this.closeEditModal();
       },
       error: (error) => {
@@ -249,6 +363,7 @@ export class CardsComponent implements OnInit {
       this.cardsService.deleteCard(this.selectedCard.id).subscribe({
         next: () => {
           this.cards = this.cards.filter(c => c.id !== this.selectedCard.id);
+          this.applyFilters();
           this.closeViewModal();
         },
         error: (error) => {
@@ -265,6 +380,3 @@ export class CardsComponent implements OnInit {
     return card.image_url || '';
   }
 }
-
-
-

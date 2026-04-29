@@ -9,8 +9,18 @@
     </button>
   </div>
 
-  <div class="tags-grid" *ngIf="tags.length > 0">
-    <div class="tag-card" *ngFor="let tag of tags">
+  <div class="search-container">
+    <input 
+      type="text" 
+      placeholder="Search tags..." 
+      [(ngModel)]="searchQuery"
+      (input)="onSearchChange()"
+      class="search-input"
+    />
+  </div>
+
+  <div class="tags-grid" *ngIf="filteredTags.length > 0">
+    <div class="tag-card" *ngFor="let tag of filteredTags">
       <div class="tag-content">
         <h3>{{ tag.name }}</h3>
       </div>
@@ -23,13 +33,22 @@
     </div>
   </div>
 
-  <div class="empty-state" *ngIf="tags.length === 0">
+  <div class="empty-state" *ngIf="filteredTags.length === 0 && tags.length === 0">
     <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
       <line x1="7" y1="7" x2="7.01" y2="7"></line>
     </svg>
     <h2>No tags yet</h2>
     <p>Create your first tag to organize your cards</p>
+  </div>
+
+  <div class="empty-state" *ngIf="filteredTags.length === 0 && tags.length > 0">
+    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="m21 21-4.35-4.35"></path>
+    </svg>
+    <h2>No tags found</h2>
+    <p>Try adjusting your search</p>
   </div>
 </div>
 
@@ -64,4 +83,5 @@
     </div>
   </div>
 </div>
+
 
