@@ -234,9 +234,35 @@
     </div>
 
     <div class="modal-body modal-body-scrollable">
+      <div class="view-dates">
+        <span class="view-date">Created: {{ selectedCard?.created_at | date:'short' }}</span>
+        <span class="view-date">Updated: {{ selectedCard?.updated_at | date:'short' }}</span>
+      </div>
+
       <div class="view-image" *ngIf="selectedCard?.image_url || selectedCard?.image_data" (click)="onImageClick($event, getImageSource(selectedCard))">
         <img [src]="getImageSource(selectedCard)" [alt]="selectedCard.title" />
       </div>
+
+      <!-- Task-specific fields display -->
+      <div class="view-section" *ngIf="selectedCard?.master_tag === 'task'">
+        <h3>Task Details</h3>
+        <div class="task-info">
+          <div class="task-status" [class.completed]="selectedCard?.master_tag_data?.completed">
+            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>{{ selectedCard?.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.deadline">
+            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>{{ selectedCard?.master_tag_data?.deadline | date:'medium' }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="view-section" *ngIf="selectedCard?.description">
         <h3>Description</h3>
         <p>{{ selectedCard.description }}</p>
@@ -248,8 +274,8 @@
         </div>
       </div>
       <div class="view-section" *ngIf="selectedCard?.master_tag">
-        <h3>Master Tag</h3>
-        <span class="master-tag">{{ selectedCard.master_tag }}</span>
+        <h3>Card Type</h3>
+        <span class="master-tag">{{ getMasterTagName(selectedCard.master_tag) }}</span>
       </div>
     </div>
 
@@ -286,7 +312,20 @@
 
     <div class="modal-body">
       <div class="form-group">
-        <label for="edit-title">Title</label>
+        <label for="edit-master-tag">Card Type *</label>
+        <select 
+          id="edit-master-tag" 
+          [(ngModel)]="editCard.master_tag"
+          (change)="onMasterTagChange(editCard)"
+          required>
+          <option *ngFor="let mt of masterTags" [value]="mt.id">
+            {{ mt.icon }} {{ mt.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-title">Title *</label>
         <input
           type="text"
           id="edit-title"
@@ -294,6 +333,28 @@
           placeholder="Enter card title"
           required
         />
+      </div>
+
+      <!-- Task-specific fields -->
+      <div *ngIf="editCard.master_tag === 'task'" class="master-tag-fields">
+        <div class="form-group">
+          <label for="edit-task-deadline">Deadline</label>
+          <input
+            type="datetime-local"
+            id="edit-task-deadline"
+            [(ngModel)]="editCard.master_tag_data.deadline"
+            placeholder="When is this due?"
+          />
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="editCard.master_tag_data.completed"
+            />
+            <span>Mark as completed</span>
+          </label>
+        </div>
       </div>
 
       <div class="form-group">

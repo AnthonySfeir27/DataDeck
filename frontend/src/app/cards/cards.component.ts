@@ -487,6 +487,11 @@ export class CardsComponent implements OnInit {
     }
     return card.image_url || '';
   }
+
+  getMasterTagName(masterTagId: string): string {
+    const tag = this.masterTags.find(mt => mt.id === masterTagId);
+    return tag ? `${tag.icon} ${tag.name}` : masterTagId;
+  }
 }
 
 
