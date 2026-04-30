@@ -12,8 +12,8 @@ export class CardComponent implements OnInit, OnChanges {
   
   imageSource: string = '';
   masterTags = [
-    { id: 'note', icon: '📝' },
-    { id: 'task', icon: '✅' }
+    { id: 'note' },
+    { id: 'task' }
   ];
 
   ngOnInit(): void {
@@ -45,8 +45,19 @@ export class CardComponent implements OnInit, OnChanges {
     }
   }
 
-  getMasterTagIcon(masterTagId: string): string {
-    const tag = this.masterTags.find(mt => mt.id === masterTagId);
-    return tag ? tag.icon : '';
+  getSeriesProgress(card: any): string {
+    if (!card.master_tag_data?.watched_episodes) {
+      return '0 episodes watched';
+    }
+    
+    let totalEpisodes = 0;
+    let watchedEpisodes = 0;
+    
+    card.master_tag_data.watched_episodes.forEach((season: any) => {
+      totalEpisodes += season.episodes.length;
+      watchedEpisodes += season.episodes.filter((e: boolean) => e).length;
+    });
+    
+    return `${watchedEpisodes}/${totalEpisodes} episodes`;
   }
 }

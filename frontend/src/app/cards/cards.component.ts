@@ -16,7 +16,9 @@ export class CardsComponent implements OnInit {
   filteredTagsForSelector: any[] = [];
   masterTags = [
     { id: 'note', name: 'Note', icon: '📝' },
-    { id: 'task', name: 'Task', icon: '✅' }
+    { id: 'task', name: 'Task', icon: '✅' },
+    { id: 'movie', name: 'Movie', icon: '🎬' },
+    { id: 'tv_series', name: 'TV Series', icon: '📺' }
   ];
   showCreateModal: boolean = false;
   showViewModal: boolean = false;
@@ -366,6 +368,19 @@ export class CardsComponent implements OnInit {
         deadline: '',
         completed: false
       };
+    } else if (card.master_tag === 'movie') {
+      card.master_tag_data = {
+        watched: false,
+        watch_date: '',
+        movie_url: ''
+      };
+    } else if (card.master_tag === 'tv_series') {
+      card.master_tag_data = {
+        season_count: 1,
+        episodes_per_season: [10], // Initialize with first season having 10 episodes
+        series_url: '',
+        watched_episodes: [{ episodes: Array(10).fill(false) }] // Initialize first season episodes
+      };
     } else {
       card.master_tag_data = {};
     }
@@ -491,6 +506,107 @@ export class CardsComponent implements OnInit {
   getMasterTagName(masterTagId: string): string {
     const tag = this.masterTags.find(mt => mt.id === masterTagId);
     return tag ? `${tag.icon} ${tag.name}` : masterTagId;
+  }
+
+  onSeasonCountChange(card: any): void {
+    const seasonCount = parseInt(card.master_tag_data.season_count) || 1;
+    
+    // Initialize episodes_per_season array
+    if (!card.master_tag_data.episodes_per_season) {
+      card.master_tag_data.episodes_per_season = [];
+    }
+    
+    // Adjust array size to match season count
+    while (card.master_tag_data.episodes_per_season.length < seasonCount) {
+      card.master_tag_data.episodes_per_season.push(10); // Each new season defaults to 10 episodes (not copying from previous)
+    }
+    
+    if (card.master_tag_data.episodes_per_season.length > seasonCount) {
+      card.master_tag_data.episodes_per_season = card.master_tag_data.episodes_per_season.slice(0, seasonCount);
+    }
+    
+    // Update watched episodes structure
+    this.updateWatchedEpisodesStructure(card);
+  }
+
+  updateWatchedEpisodesStructure(card: any): void {
+    if (!card.master_tag_data.watched_episodes) {
+      card.master_tag_data.watched_episodes = [];
+    }
+    
+    const newWatchedEpisodes: any[] = [];
+    
+    for (let s = 0; s < card.master_tag_data.episodes_per_season.length; s++) {
+      const episodeCount = card.master_tag_data.episodes_per_season[s] || 0;
+      const existingSeason = card.master_tag_data.watched_episodes[s] || { episodes: [] };
+      
+      const episodes: boolean[] = [];
+      for (let e = 0; e < episodeCount; e++) {
+        episodes.push(existingSeason.episodes[e] || false);
+      }
+      
+      newWatchedEpisodes.push({ episodes });
+    }
+    
+    card.master_tag_data.watched_episodes = newWatchedEpisodes;
+  }
+
+  toggleEpisode(card: any, seasonIndex: number, episodeIndex: number): void {
+    if (card.master_tag_data.watched_episodes[seasonIndex]) {
+      const current = card.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex];
+      card.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex] = !current;
+    }
+  }
+
+  getWatchedCount(episodes: boolean[]): number {
+    if (!episodes) return 0;
+    return episodes.filter(e => e).length;
+  }
+
+  toggleNewEpisode(seasonIndex: number, episodeIndex: number): void {
+    this.newCard.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex] = 
+      !this.newCard.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex];
+  }
+
+  toggleEditEpisode(seasonIndex: number, episodeIndex: number): void {
+    this.editCard.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex] = 
+      !this.editCard.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex];
+  }
+
+  toggleViewEpisode(seasonIndex: number, episodeIndex: number): void {
+    this.selectedCard.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex] = 
+      !this.selectedCard.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex];
+    this.onTaskCompletionToggle();
+  }
+
+  onTaskCompletionToggle(): void {
+    if (!this.selectedCard) return;
+
+    const updateData: any = {
+      title: this.selectedCard.title,
+      description: this.selectedCard.description,
+      tags: this.selectedCard.tags,
+      master_tag: this.selectedCard.master_tag,
+      urls: this.selectedCard.urls || [],
+      master_tag_data: this.selectedCard.master_tag_data,
+      image_url: this.selectedCard.image_url || '',
+      image_data: this.selectedCard.image_data || ''
+    };
+
+    this.cardsService.updateCard(this.selectedCard.id, updateData).subscribe({
+      next: (response) => {
+        const index = this.cards.findIndex(c => c.id === this.selectedCard.id);
+        if (index !== -1) {
+          this.cards[index] = { ...this.cards[index], ...response.card };
+        }
+        this.applyFilters();
+        console.log('[Cards] Task completion toggled');
+      },
+      error: (error) => {
+        console.error('[Cards] Error toggling task completion:', error);
+        alert('Error updating task');
+      }
+    });
   }
 }
 

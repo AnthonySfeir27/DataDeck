@@ -98,7 +98,7 @@
       </button>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body modal-body-scrollable">
       <div class="form-group">
         <label for="master-tag">Card Type *</label>
         <select 
@@ -142,6 +142,101 @@
             />
             <span>Mark as completed</span>
           </label>
+        </div>
+      </div>
+
+      <!-- Movie-specific fields -->
+      <div *ngIf="newCard.master_tag === 'movie'" class="master-tag-fields">
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="newCard.master_tag_data.watched"
+            />
+            <span>I've watched this movie</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="movie-watch-date">Watch Date</label>
+          <input
+            type="datetime-local"
+            id="movie-watch-date"
+            [(ngModel)]="newCard.master_tag_data.watch_date"
+            placeholder="When did you watch it?"
+          />
+        </div>
+        <div class="form-group">
+          <label for="movie-url">Movie URL</label>
+          <input
+            type="url"
+            id="movie-url"
+            [(ngModel)]="newCard.master_tag_data.movie_url"
+            placeholder="Link to IMDb, Letterboxd, etc."
+          />
+        </div>
+      </div>
+
+      <!-- TV Series-specific fields -->
+      <div *ngIf="newCard.master_tag === 'tv_series'" class="master-tag-fields">
+        <div class="form-group">
+          <label for="series-season-count">Number of Seasons *</label>
+          <input
+            type="number"
+            id="series-season-count"
+            [(ngModel)]="newCard.master_tag_data.season_count"
+            (ngModelChange)="onSeasonCountChange(newCard)"
+            min="1"
+            placeholder="How many seasons?"
+            required
+          />
+        </div>
+        
+        <div class="form-group">
+          <label>Episodes Per Season *</label>
+          <div class="episodes-per-season-list">
+            <div *ngFor="let count of newCard.master_tag_data.episodes_per_season; let i = index" class="season-episode-input">
+              <label>Season {{ i + 1 }}:</label>
+              <input
+                type="number"
+                [(ngModel)]="newCard.master_tag_data.episodes_per_season[i]"
+                (ngModelChange)="updateWatchedEpisodesStructure(newCard)"
+                min="1"
+                placeholder="Episodes"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="series-url">Series URL</label>
+          <input
+            type="url"
+            id="series-url"
+            [(ngModel)]="newCard.master_tag_data.series_url"
+            placeholder="Link to IMDb, TV database, etc."
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Episodes Watched</label>
+          <div class="episodes-tracker">
+            <div *ngFor="let season of newCard.master_tag_data.watched_episodes; let s = index" class="season-tracker">
+              <h4>Season {{ s + 1 }}</h4>
+              <div class="episodes-grid">
+                <div *ngFor="let watched of season.episodes; let e = index" 
+                     class="episode-checkbox"
+                     (click)="toggleNewEpisode(s, e)">
+                  <input
+                    type="checkbox"
+                    [checked]="newCard.master_tag_data.watched_episodes[s].episodes[e]"
+                    readonly
+                  />
+                  <span>Ep {{ e + 1 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -247,18 +342,98 @@
       <div class="view-section" *ngIf="selectedCard?.master_tag === 'task'">
         <h3>Task Details</h3>
         <div class="task-info">
-          <div class="task-status" [class.completed]="selectedCard?.master_tag_data?.completed">
-            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span>{{ selectedCard?.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}</span>
+          <div class="task-status-toggle">
+            <label class="checkbox-toggle">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="selectedCard.master_tag_data.completed"
+                (change)="onTaskCompletionToggle()"
+              />
+              <span class="checkbox-custom">
+                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              <span class="checkbox-label">{{ selectedCard?.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}</span>
+            </label>
           </div>
           <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.deadline">
             <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            <span>{{ selectedCard?.master_tag_data?.deadline | date:'medium' }}</span>
+            <span>Deadline: {{ selectedCard?.master_tag_data?.deadline | date:'medium' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Movie-specific fields display -->
+      <div class="view-section" *ngIf="selectedCard?.master_tag === 'movie'">
+        <h3>Movie Details</h3>
+        <div class="task-info">
+          <div class="task-status-toggle">
+            <label class="checkbox-toggle">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="selectedCard.master_tag_data.watched"
+                (change)="onTaskCompletionToggle()"
+              />
+              <span class="checkbox-custom">
+                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              <span class="checkbox-label">{{ selectedCard?.master_tag_data?.watched ? 'Watched' : 'Not Watched' }}</span>
+            </label>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.watch_date">
+            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Watched on: {{ selectedCard?.master_tag_data?.watch_date | date:'medium' }}</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.movie_url">
+            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <a [href]="selectedCard.master_tag_data.movie_url" target="_blank" class="movie-link">View Movie</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- TV Series-specific fields display -->
+      <div class="view-section" *ngIf="selectedCard?.master_tag === 'tv_series'">
+        <h3>TV Series Details</h3>
+        <div class="task-info">
+          <div class="task-deadline">
+            <span>{{ selectedCard?.master_tag_data?.season_count }} Season(s)</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.series_url">
+            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <a [href]="selectedCard.master_tag_data.series_url" target="_blank" class="movie-link">View Series</a>
+          </div>
+        </div>
+
+        <div class="episodes-tracker-view">
+          <div *ngFor="let season of selectedCard?.master_tag_data?.watched_episodes; let s = index" class="season-tracker-view">
+            <h4>Season {{ s + 1 }} ({{ getWatchedCount(season.episodes) }}/{{ season.episodes.length }} watched)</h4>
+            <div class="episodes-grid-view">
+              <div *ngFor="let watched of season.episodes; let e = index" 
+                   class="episode-checkbox-view"
+                   (click)="toggleViewEpisode(s, e)">
+                <input
+                  type="checkbox"
+                  [checked]="selectedCard.master_tag_data.watched_episodes[s].episodes[e]"
+                  readonly
+                />
+                <span>{{ e + 1 }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -310,7 +485,7 @@
       </button>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body modal-body-scrollable">
       <div class="form-group">
         <label for="edit-master-tag">Card Type *</label>
         <select 
@@ -354,6 +529,101 @@
             />
             <span>Mark as completed</span>
           </label>
+        </div>
+      </div>
+
+      <!-- Movie-specific fields -->
+      <div *ngIf="editCard.master_tag === 'movie'" class="master-tag-fields">
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="editCard.master_tag_data.watched"
+            />
+            <span>I've watched this movie</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="edit-movie-watch-date">Watch Date</label>
+          <input
+            type="datetime-local"
+            id="edit-movie-watch-date"
+            [(ngModel)]="editCard.master_tag_data.watch_date"
+            placeholder="When did you watch it?"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-movie-url">Movie URL</label>
+          <input
+            type="url"
+            id="edit-movie-url"
+            [(ngModel)]="editCard.master_tag_data.movie_url"
+            placeholder="Link to IMDb, Letterboxd, etc."
+          />
+        </div>
+      </div>
+
+      <!-- TV Series-specific fields -->
+      <div *ngIf="editCard.master_tag === 'tv_series'" class="master-tag-fields">
+        <div class="form-group">
+          <label for="edit-series-season-count">Number of Seasons *</label>
+          <input
+            type="number"
+            id="edit-series-season-count"
+            [(ngModel)]="editCard.master_tag_data.season_count"
+            (ngModelChange)="onSeasonCountChange(editCard)"
+            min="1"
+            placeholder="How many seasons?"
+            required
+          />
+        </div>
+        
+        <div class="form-group">
+          <label>Episodes Per Season *</label>
+          <div class="episodes-per-season-list">
+            <div *ngFor="let count of editCard.master_tag_data.episodes_per_season; let i = index" class="season-episode-input">
+              <label>Season {{ i + 1 }}:</label>
+              <input
+                type="number"
+                [(ngModel)]="editCard.master_tag_data.episodes_per_season[i]"
+                (ngModelChange)="updateWatchedEpisodesStructure(editCard)"
+                min="1"
+                placeholder="Episodes"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-series-url">Series URL</label>
+          <input
+            type="url"
+            id="edit-series-url"
+            [(ngModel)]="editCard.master_tag_data.series_url"
+            placeholder="Link to IMDb, TV database, etc."
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Episodes Watched</label>
+          <div class="episodes-tracker">
+            <div *ngFor="let season of editCard.master_tag_data.watched_episodes; let s = index" class="season-tracker">
+              <h4>Season {{ s + 1 }}</h4>
+              <div class="episodes-grid">
+                <div *ngFor="let watched of season.episodes; let e = index" 
+                     class="episode-checkbox"
+                     (click)="toggleEditEpisode(s, e)">
+                  <input
+                    type="checkbox"
+                    [checked]="editCard.master_tag_data.watched_episodes[s].episodes[e]"
+                    readonly
+                  />
+                  <span>Ep {{ e + 1 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

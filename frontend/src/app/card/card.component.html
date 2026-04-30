@@ -6,31 +6,118 @@
   <div class="card-image" *ngIf="card.image_url || card.image_data" (click)="onImageClick($event)">
     <img [src]="imageSource" [alt]="card.title" />
   </div>
+  
   <div class="card-content">
     <h3 class="card-title">{{ card.title }}</h3>
     
-    <!-- Task status -->
-    <div class="card-task-status" *ngIf="card.master_tag === 'task'">
-      <span class="task-badge" [class.completed]="card.master_tag_data?.completed">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <!-- Task: Show deadline and completion status -->
+    <div *ngIf="card.master_tag === 'task'" class="task-details">
+      <p class="task-deadline-text" *ngIf="card.master_tag_data?.deadline">
+        <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        {{ card.master_tag_data.deadline | date:'medium' }}
+      </p>
+      <div class="task-completion-status">
+        <svg class="task-check-icon" 
+             [class.completed]="card.master_tag_data?.completed"
+             viewBox="0 0 24 24" 
+             fill="none" 
+             stroke="currentColor" 
+             stroke-width="2">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
-        {{ card.master_tag_data?.completed ? 'Done' : 'Todo' }}
-      </span>
-      <span class="task-deadline" *ngIf="card.master_tag_data?.deadline">
-        📅 {{ card.master_tag_data.deadline | date:'short' }}
-      </span>
+        <span [class.completed]="card.master_tag_data?.completed">
+          {{ card.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}
+        </span>
+      </div>
     </div>
     
-    <p class="card-description" [class.full-height]="!card.image_url && !card.image_data">
+    <!-- Movie: Show watch date and status -->
+    <div *ngIf="card.master_tag === 'movie'" class="task-details">
+      <p class="task-deadline-text" *ngIf="card.master_tag_data?.watch_date">
+        <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        {{ card.master_tag_data.watch_date | date:'medium' }}
+      </p>
+      <div class="task-completion-status">
+        <svg class="task-check-icon" 
+             [class.completed]="card.master_tag_data?.watched"
+             viewBox="0 0 24 24" 
+             fill="none" 
+             stroke="currentColor" 
+             stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span [class.completed]="card.master_tag_data?.watched">
+          {{ card.master_tag_data?.watched ? 'Watched' : 'Not Watched' }}
+        </span>
+      </div>
+    </div>
+    
+    <!-- TV Series: Show progress -->
+    <div *ngIf="card.master_tag === 'tv_series'" class="task-details">
+      <p class="task-deadline-text">
+        <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+          <polyline points="17 2 12 7 7 2"></polyline>
+        </svg>
+        {{ card.master_tag_data?.season_count }} Season(s)
+      </p>
+      <div class="task-completion-status">
+        <svg class="task-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        <span>{{ getSeriesProgress(card) }}</span>
+      </div>
+    </div>
+    
+    <!-- Regular cards: Show description -->
+    <p class="card-description" *ngIf="card.master_tag !== 'task' && card.master_tag !== 'movie' && card.master_tag !== 'tv_series'" [class.full-height]="!card.image_url && !card.image_data">
       {{ card.description }}
     </p>
   </div>
+  
   <div class="card-footer">
     <div class="card-tags" *ngIf="card.tags && card.tags.length > 0">
       <span class="tag" *ngFor="let tag of card.tags.slice(0, 3)">{{ tag }}</span>
       <span class="tag-more" *ngIf="card.tags.length > 3">+{{ card.tags.length - 3 }}</span>
     </div>
-    <span class="master-tag" *ngIf="card.master_tag">{{ getMasterTagIcon(card.master_tag) }}</span>
+    
+    <div class="card-footer-right">
+      <!-- Master tag icon -->
+      <svg *ngIf="card.master_tag === 'note'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      
+      <svg *ngIf="card.master_tag === 'task'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      
+      <svg *ngIf="card.master_tag === 'movie'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+        <line x1="7" y1="2" x2="7" y2="22"></line>
+        <line x1="17" y1="2" x2="17" y2="22"></line>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <line x1="2" y1="7" x2="7" y2="7"></line>
+        <line x1="2" y1="17" x2="7" y2="17"></line>
+        <line x1="17" y1="17" x2="22" y2="17"></line>
+        <line x1="17" y1="7" x2="22" y2="7"></line>
+      </svg>
+
+      <svg *ngIf="card.master_tag === 'tv_series'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+        <polyline points="17 2 12 7 7 2"></polyline>
+      </svg>
+    </div>
   </div>
 </div>
