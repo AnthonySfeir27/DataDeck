@@ -114,6 +114,7 @@ def create_card(request):
     master_tag = request.data.get('master_tag')
     image_url = request.data.get('image_url')
     image_data = request.data.get('image_data')
+    image_urls = request.data.get('image_urls', [])
     urls = request.data.get('urls', [])
     master_tag_data = request.data.get('master_tag_data', {})
 
@@ -133,6 +134,7 @@ def create_card(request):
         'master_tag': master_tag,
         'image_url': image_url,
         'image_data': image_data,
+        'image_urls': image_urls,
         'urls': urls,
         'master_tag_data': master_tag_data,
         'created_at': datetime.utcnow().isoformat(),
@@ -151,6 +153,7 @@ def create_card(request):
             'master_tag': master_tag,
             'image_url': image_url,
             'image_data': image_data,
+            'image_urls': image_urls,
             'urls': urls,
             'master_tag_data': master_tag_data,
             'created_at': card_data['created_at'],
@@ -201,6 +204,7 @@ def update_card(request, card_id):
     master_tag = request.data.get('master_tag')
     image_url = request.data.get('image_url')
     image_data = request.data.get('image_data')
+    image_urls = request.data.get('image_urls', [])
     urls = request.data.get('urls', [])
     master_tag_data = request.data.get('master_tag_data', {})
 
@@ -219,6 +223,7 @@ def update_card(request, card_id):
         'master_tag': master_tag,
         'image_url': image_url,
         'image_data': image_data,
+        'image_urls': image_urls,
         'urls': urls,
         'master_tag_data': master_tag_data,
         'updated_at': datetime.utcnow().isoformat()
@@ -245,6 +250,7 @@ def update_card(request, card_id):
             'master_tag': master_tag,
             'image_url': image_url,
             'image_data': image_data,
+            'image_urls': image_urls,
             'urls': urls,
             'master_tag_data': master_tag_data,
             'updated_at': update_data['updated_at']

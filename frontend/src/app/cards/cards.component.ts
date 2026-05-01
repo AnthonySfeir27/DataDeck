@@ -452,6 +452,9 @@ export class CardsComponent implements OnInit {
       user_id: user.id
     };
 
+    console.log('[CREATE] Sending image_urls:', this.newCard.image_urls);
+    console.log('[CREATE] Sending urls:', this.newCard.urls);
+
     if (this.imageUploadMethod === 'url' && this.newCard.image_url) {
       cardData.image_url = this.newCard.image_url;
       cardData.image_data = '';
@@ -462,6 +465,8 @@ export class CardsComponent implements OnInit {
 
     this.cardsService.createCard(cardData).subscribe({
       next: (response) => {
+        console.log('[CREATE] Backend response:', response.card);
+        console.log('[CREATE] Saved image_urls:', response.card.image_urls);
         this.cards.push(response.card);
         this.applyFilters();
         this.closeCreateModal();
@@ -620,6 +625,14 @@ export class CardsComponent implements OnInit {
 
   trackByIndex(index: number, item: any): number {
     return index;
+  }
+
+  ensureHttpProtocol(url: string): string {
+    if (!url) return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return 'https://' + url;
   }
 
   // URL Management

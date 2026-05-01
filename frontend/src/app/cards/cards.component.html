@@ -575,6 +575,20 @@
         <h3>Description</h3>
         <p>{{ selectedCard.description }}</p>
       </div>
+
+      <div class="view-section" *ngIf="selectedCard?.urls && selectedCard.urls.length > 0">
+        <h3>URLs</h3>
+        <div class="urls-list">
+          <a *ngFor="let url of selectedCard.urls" [href]="ensureHttpProtocol(url)" target="_blank" rel="noopener noreferrer" class="url-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            {{ url }}
+          </a>
+        </div>
+      </div>
+
       <div class="view-section" *ngIf="selectedCard?.tags && selectedCard.tags.length > 0">
         <h3>Tags</h3>
         <div class="tags-list">
