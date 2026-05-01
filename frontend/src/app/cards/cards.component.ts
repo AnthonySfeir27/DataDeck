@@ -19,7 +19,8 @@ export class CardsComponent implements OnInit {
     { id: 'task', name: 'Task', icon: '✅' },
     { id: 'movie', name: 'Movie', icon: '🎬' },
     { id: 'tv_series', name: 'TV Series', icon: '📺' },
-    { id: 'book', name: 'Book', icon: '📚' }
+    { id: 'book', name: 'Book', icon: '📚' },
+    { id: 'game', name: 'Game', icon: '🎮' }
   ];
   showCreateModal: boolean = false;
   showViewModal: boolean = false;
@@ -417,6 +418,15 @@ export class CardsComponent implements OnInit {
         current_page: 0,
         rating: 0,
         book_url: ''
+      };
+    } else if (card.master_tag === 'game') {
+      card.master_tag_data = {
+        completed: false,
+        completion_date: '',
+        hours_played: 0,
+        platform: '',
+        rating: 0,
+        game_url: ''
       };
     } else {
       card.master_tag_data = {};

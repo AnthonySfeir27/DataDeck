@@ -304,6 +304,69 @@
         </div>
       </div>
 
+      <!-- Game-specific fields -->
+      <div *ngIf="newCard.master_tag === 'game'" class="master-tag-fields">
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="newCard.master_tag_data.completed"
+            />
+            <span>I've completed this game</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="game-completion-date">Completion Date</label>
+          <input
+            type="datetime-local"
+            id="game-completion-date"
+            [(ngModel)]="newCard.master_tag_data.completion_date"
+            placeholder="When did you beat it?"
+          />
+        </div>
+        <div class="form-group">
+          <label for="game-hours">Hours Played</label>
+          <input
+            type="number"
+            id="game-hours"
+            [(ngModel)]="newCard.master_tag_data.hours_played"
+            min="0"
+            step="0.5"
+            placeholder="Total playtime"
+          />
+        </div>
+        <div class="form-group">
+          <label for="game-platform">Platform</label>
+          <input
+            type="text"
+            id="game-platform"
+            [(ngModel)]="newCard.master_tag_data.platform"
+            placeholder="PC, PS5, Xbox, Switch, etc."
+          />
+        </div>
+        <div class="form-group">
+          <label for="game-rating">Rating (1-5 stars)</label>
+          <input
+            type="number"
+            id="game-rating"
+            [(ngModel)]="newCard.master_tag_data.rating"
+            min="0"
+            max="5"
+            step="0.5"
+            placeholder="Your rating"
+          />
+        </div>
+        <div class="form-group">
+          <label for="game-url">Game URL</label>
+          <input
+            type="url"
+            id="game-url"
+            [(ngModel)]="newCard.master_tag_data.game_url"
+            placeholder="Link to Steam, store page, etc."
+          />
+        </div>
+      </div>
+
       <div class="form-group">
         <label>Image</label>
         <div class="image-upload-toggle">
@@ -571,6 +634,77 @@
         </div>
       </div>
 
+      <div class="view-section" *ngIf="selectedCard?.master_tag === 'book'">
+        <h3>Book Details</h3>
+        <div class="task-info">
+          <div class="task-completion">
+            <svg class="task-check-icon" [class.completed]="selectedCard?.master_tag_data?.read" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span [class.completed]="selectedCard?.master_tag_data?.read">
+              {{ selectedCard?.master_tag_data?.read ? 'Read' : 'Not Read' }}
+            </span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.read_date">
+            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Finished: {{ selectedCard?.master_tag_data?.read_date | date:'medium' }}</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.pages">
+            <span>{{ selectedCard?.master_tag_data?.current_page || 0 }} / {{ selectedCard?.master_tag_data?.pages }} pages</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.rating">
+            <span>⭐ {{ selectedCard?.master_tag_data?.rating }} / 5</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.book_url">
+            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.book_url)" target="_blank" class="movie-link">View Book</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-section" *ngIf="selectedCard?.master_tag === 'game'">
+        <h3>Game Details</h3>
+        <div class="task-info">
+          <div class="task-completion">
+            <svg class="task-check-icon" [class.completed]="selectedCard?.master_tag_data?.completed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span [class.completed]="selectedCard?.master_tag_data?.completed">
+              {{ selectedCard?.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}
+            </span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.completion_date">
+            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Completed: {{ selectedCard?.master_tag_data?.completion_date | date:'medium' }}</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.hours_played">
+            <span>⏱️ {{ selectedCard?.master_tag_data?.hours_played }} hours played</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.platform">
+            <span>🎮 {{ selectedCard?.master_tag_data?.platform }}</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.rating">
+            <span>⭐ {{ selectedCard?.master_tag_data?.rating }} / 5</span>
+          </div>
+          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.game_url">
+            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.game_url)" target="_blank" class="movie-link">View Game</a>
+          </div>
+        </div>
+      </div>
+
       <div class="view-section" *ngIf="selectedCard?.description">
         <h3>Description</h3>
         <p>{{ selectedCard.description }}</p>
@@ -771,6 +905,133 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Book-specific edit fields -->
+      <div *ngIf="editCard.master_tag === 'book'" class="master-tag-fields">
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="editCard.master_tag_data.read"
+            />
+            <span>I've read this book</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="edit-book-read-date">Read Date</label>
+          <input
+            type="datetime-local"
+            id="edit-book-read-date"
+            [(ngModel)]="editCard.master_tag_data.read_date"
+            placeholder="When did you finish it?"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-book-pages">Total Pages</label>
+          <input
+            type="number"
+            id="edit-book-pages"
+            [(ngModel)]="editCard.master_tag_data.pages"
+            min="0"
+            placeholder="Number of pages"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-book-current-page">Current Page</label>
+          <input
+            type="number"
+            id="edit-book-current-page"
+            [(ngModel)]="editCard.master_tag_data.current_page"
+            min="0"
+            [max]="editCard.master_tag_data.pages || 999999"
+            placeholder="What page are you on?"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-book-rating">Rating (1-5 stars)</label>
+          <input
+            type="number"
+            id="edit-book-rating"
+            [(ngModel)]="editCard.master_tag_data.rating"
+            min="0"
+            max="5"
+            step="0.5"
+            placeholder="Your rating"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-book-url">Book URL</label>
+          <input
+            type="url"
+            id="edit-book-url"
+            [(ngModel)]="editCard.master_tag_data.book_url"
+            placeholder="Link to Goodreads, Amazon, etc."
+          />
+        </div>
+      </div>
+
+      <!-- Game-specific edit fields -->
+      <div *ngIf="editCard.master_tag === 'game'" class="master-tag-fields">
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="editCard.master_tag_data.completed"
+            />
+            <span>I've completed this game</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="edit-game-completion-date">Completion Date</label>
+          <input
+            type="datetime-local"
+            id="edit-game-completion-date"
+            [(ngModel)]="editCard.master_tag_data.completion_date"
+            placeholder="When did you beat it?"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-game-hours">Hours Played</label>
+          <input
+            type="number"
+            id="edit-game-hours"
+            [(ngModel)]="editCard.master_tag_data.hours_played"
+            min="0"
+            step="0.5"
+            placeholder="Total playtime"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-game-platform">Platform</label>
+          <input
+            type="text"
+            id="edit-game-platform"
+            [(ngModel)]="editCard.master_tag_data.platform"
+            placeholder="PC, PS5, Xbox, Switch, etc."
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-game-rating">Rating (1-5 stars)</label>
+          <input
+            type="number"
+            id="edit-game-rating"
+            [(ngModel)]="editCard.master_tag_data.rating"
+            min="0"
+            max="5"
+            step="0.5"
+            placeholder="Your rating"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit-game-url">Game URL</label>
+          <input
+            type="url"
+            id="edit-game-url"
+            [(ngModel)]="editCard.master_tag_data.game_url"
+            placeholder="Link to Steam, store page, etc."
+          />
         </div>
       </div>
 

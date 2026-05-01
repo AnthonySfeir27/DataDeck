@@ -79,6 +79,57 @@
           <span>{{ getSeriesProgress(card) }}</span>
         </div>
       </div>
+
+      <!-- Book: Show progress and rating -->
+      <div *ngIf="card.master_tag === 'book'" class="task-details">
+        <p class="task-deadline-text" *ngIf="card.master_tag_data?.pages">
+          <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          {{ card.master_tag_data?.current_page || 0 }}/{{ card.master_tag_data?.pages }} pages
+        </p>
+        <div class="task-completion-status">
+          <svg class="task-check-icon" 
+               [class.completed]="card.master_tag_data?.read"
+               viewBox="0 0 24 24" 
+               fill="none" 
+               stroke="currentColor" 
+               stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span [class.completed]="card.master_tag_data?.read">
+            {{ card.master_tag_data?.read ? 'Read' : 'Not Read' }}
+            <span *ngIf="card.master_tag_data?.rating"> • ⭐ {{ card.master_tag_data?.rating }}/5</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Game: Show completion and platform -->
+      <div *ngIf="card.master_tag === 'game'" class="task-details">
+        <p class="task-deadline-text" *ngIf="card.master_tag_data?.platform">
+          <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="6" y="4" width="12" height="16" rx="2"></rect>
+            <line x1="12" y1="18" x2="12" y2="18"></line>
+          </svg>
+          {{ card.master_tag_data?.platform }}
+          <span *ngIf="card.master_tag_data?.hours_played"> • {{ card.master_tag_data?.hours_played }}h</span>
+        </p>
+        <div class="task-completion-status">
+          <svg class="task-check-icon" 
+               [class.completed]="card.master_tag_data?.completed"
+               viewBox="0 0 24 24" 
+               fill="none" 
+               stroke="currentColor" 
+               stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span [class.completed]="card.master_tag_data?.completed">
+            {{ card.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}
+            <span *ngIf="card.master_tag_data?.rating"> • ⭐ {{ card.master_tag_data?.rating }}/5</span>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -152,6 +203,11 @@
       <svg *ngIf="card.master_tag === 'book'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+
+      <svg *ngIf="card.master_tag === 'game'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="6" y="4" width="12" height="16" rx="2"></rect>
+        <line x1="12" y1="18" x2="12" y2="18"></line>
       </svg>
     </div>
   </div>
