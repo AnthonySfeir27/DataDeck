@@ -5,6 +5,7 @@
   
   <div class="card-image" *ngIf="card.image_url || card.image_data" (click)="onImageClick($event)">
     <img [src]="imageSource" [alt]="card.title" />
+    <div class="image-gradient"></div>
   </div>
   
   <div class="card-content">

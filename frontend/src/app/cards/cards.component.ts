@@ -18,7 +18,8 @@ export class CardsComponent implements OnInit {
     { id: 'note', name: 'Note', icon: '📝' },
     { id: 'task', name: 'Task', icon: '✅' },
     { id: 'movie', name: 'Movie', icon: '🎬' },
-    { id: 'tv_series', name: 'TV Series', icon: '📺' }
+    { id: 'tv_series', name: 'TV Series', icon: '📺' },
+    { id: 'book', name: 'Book', icon: '📚' }
   ];
   showCreateModal: boolean = false;
   showViewModal: boolean = false;
@@ -42,6 +43,7 @@ export class CardsComponent implements OnInit {
     description: '',
     image_url: '',
     image_data: '',
+    image_urls: [] as string[],
     tags: [] as string[],
     master_tag: '',
     urls: [] as string[],
@@ -53,6 +55,7 @@ export class CardsComponent implements OnInit {
     description: '',
     image_url: '',
     image_data: '',
+    image_urls: [] as string[],
     tags: [] as string[],
     master_tag: '',
     urls: [] as string[],
@@ -248,6 +251,7 @@ export class CardsComponent implements OnInit {
       description: '',
       image_url: '',
       image_data: '',
+      image_urls: [],
       tags: [],
       master_tag: '',
       urls: [],
@@ -268,6 +272,7 @@ export class CardsComponent implements OnInit {
       description: this.selectedCard.description,
       image_url: this.selectedCard.image_url || '',
       image_data: this.selectedCard.image_data || '',
+      image_urls: [...(this.selectedCard.image_urls || [])],
       tags: [...(this.selectedCard.tags || [])],
       master_tag: this.selectedCard.master_tag || 'note',
       urls: [...(this.selectedCard.urls || [])],
@@ -286,6 +291,7 @@ export class CardsComponent implements OnInit {
       description: '',
       image_url: '',
       image_data: '',
+      image_urls: [],
       tags: [],
       master_tag: '',
       urls: [],
@@ -346,8 +352,9 @@ export class CardsComponent implements OnInit {
   }
 
   onFileSelected(event: any, isEdit: boolean = false): void {
-    const file = event.target.files[0];
-    if (file) {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      // First file goes to image_data (main image)
       const reader = new FileReader();
       reader.onload = (e: any) => {
         if (isEdit) {
@@ -358,7 +365,28 @@ export class CardsComponent implements OnInit {
           this.newCard.image_url = '';
         }
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(files[0]);
+
+      // Additional files go to image_urls array as base64
+      if (files.length > 1) {
+        for (let i = 1; i < files.length; i++) {
+          const additionalReader = new FileReader();
+          additionalReader.onload = (e: any) => {
+            if (isEdit) {
+              if (!this.editCard.image_urls) {
+                this.editCard.image_urls = [];
+              }
+              this.editCard.image_urls.push(e.target.result);
+            } else {
+              if (!this.newCard.image_urls) {
+                this.newCard.image_urls = [];
+              }
+              this.newCard.image_urls.push(e.target.result);
+            }
+          };
+          additionalReader.readAsDataURL(files[i]);
+        }
+      }
     }
   }
 
@@ -380,6 +408,15 @@ export class CardsComponent implements OnInit {
         episodes_per_season: [10], // Initialize with first season having 10 episodes
         series_url: '',
         watched_episodes: [{ episodes: Array(10).fill(false) }] // Initialize first season episodes
+      };
+    } else if (card.master_tag === 'book') {
+      card.master_tag_data = {
+        read: false,
+        read_date: '',
+        pages: 0,
+        current_page: 0,
+        rating: 0,
+        book_url: ''
       };
     } else {
       card.master_tag_data = {};
@@ -410,6 +447,7 @@ export class CardsComponent implements OnInit {
       tags: this.newCard.tags,
       master_tag: this.newCard.master_tag,
       urls: this.newCard.urls,
+      image_urls: this.newCard.image_urls || [],
       master_tag_data: this.newCard.master_tag_data,
       user_id: user.id
     };
@@ -452,6 +490,7 @@ export class CardsComponent implements OnInit {
       tags: this.editCard.tags,
       master_tag: this.editCard.master_tag,
       urls: this.editCard.urls,
+      image_urls: this.editCard.image_urls || [],
       master_tag_data: this.editCard.master_tag_data
     };
 
@@ -577,6 +616,56 @@ export class CardsComponent implements OnInit {
     this.selectedCard.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex] = 
       !this.selectedCard.master_tag_data.watched_episodes[seasonIndex].episodes[episodeIndex];
     this.onTaskCompletionToggle();
+  }
+
+  trackByIndex(index: number, item: any): number {
+    return index;
+  }
+
+  // URL Management
+  addUrl(isEdit: boolean = false): void {
+    if (isEdit) {
+      if (!this.editCard.urls) {
+        this.editCard.urls = [];
+      }
+      this.editCard.urls.push('');
+    } else {
+      if (!this.newCard.urls) {
+        this.newCard.urls = [];
+      }
+      this.newCard.urls.push('');
+    }
+  }
+
+  removeUrl(index: number, isEdit: boolean = false): void {
+    if (isEdit) {
+      this.editCard.urls.splice(index, 1);
+    } else {
+      this.newCard.urls.splice(index, 1);
+    }
+  }
+
+  // Image Management
+  addImageUrl(isEdit: boolean = false): void {
+    if (isEdit) {
+      if (!this.editCard.image_urls) {
+        this.editCard.image_urls = [];
+      }
+      this.editCard.image_urls.push('');
+    } else {
+      if (!this.newCard.image_urls) {
+        this.newCard.image_urls = [];
+      }
+      this.newCard.image_urls.push('');
+    }
+  }
+
+  removeImageUrl(index: number, isEdit: boolean = false): void {
+    if (isEdit) {
+      this.editCard.image_urls.splice(index, 1);
+    } else {
+      this.newCard.image_urls.splice(index, 1);
+    }
   }
 
   onTaskCompletionToggle(): void {

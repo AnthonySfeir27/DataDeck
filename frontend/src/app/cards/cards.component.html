@@ -240,6 +240,70 @@
         </div>
       </div>
 
+      <!-- Book-specific fields -->
+      <div *ngIf="newCard.master_tag === 'book'" class="master-tag-fields">
+        <div class="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="newCard.master_tag_data.read"
+            />
+            <span>I've read this book</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="book-read-date">Read Date</label>
+          <input
+            type="datetime-local"
+            id="book-read-date"
+            [(ngModel)]="newCard.master_tag_data.read_date"
+            placeholder="When did you finish it?"
+          />
+        </div>
+        <div class="form-group">
+          <label for="book-pages">Total Pages</label>
+          <input
+            type="number"
+            id="book-pages"
+            [(ngModel)]="newCard.master_tag_data.pages"
+            min="0"
+            placeholder="Number of pages"
+          />
+        </div>
+        <div class="form-group">
+          <label for="book-current-page">Current Page</label>
+          <input
+            type="number"
+            id="book-current-page"
+            [(ngModel)]="newCard.master_tag_data.current_page"
+            min="0"
+            [max]="newCard.master_tag_data.pages || 999999"
+            placeholder="What page are you on?"
+          />
+        </div>
+        <div class="form-group">
+          <label for="book-rating">Rating (1-5 stars)</label>
+          <input
+            type="number"
+            id="book-rating"
+            [(ngModel)]="newCard.master_tag_data.rating"
+            min="0"
+            max="5"
+            step="0.5"
+            placeholder="Your rating"
+          />
+        </div>
+        <div class="form-group">
+          <label for="book-url">Book URL</label>
+          <input
+            type="url"
+            id="book-url"
+            [(ngModel)]="newCard.master_tag_data.book_url"
+            placeholder="Link to Goodreads, Amazon, etc."
+          />
+        </div>
+      </div>
+
       <div class="form-group">
         <label>Image</label>
         <div class="image-upload-toggle">
@@ -270,9 +334,66 @@
           *ngIf="imageUploadMethod === 'file'"
           type="file"
           accept="image/*"
+          multiple
           (change)="onFileSelected($event, false)"
           class="file-input"
         />
+
+        <!-- Additional Image URLs -->
+        <div style="margin-top: 1rem;">
+          <label style="font-size: 0.9rem; color: #9ca3af; margin-bottom: 0.5rem; display: block;">Additional Images</label>
+          <div class="url-list">
+            <div *ngFor="let imgUrl of newCard.image_urls; let i = index; trackBy: trackByIndex" class="url-item">
+              <input
+                type="url"
+                [value]="newCard.image_urls[i]"
+                (input)="newCard.image_urls[i] = $any($event.target).value"
+                placeholder="https://example.com/image.jpg"
+              />
+              <button type="button" class="btn-remove" (click)="removeImageUrl(i, false)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn-add" (click)="addImageUrl(false)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add Image URL
+          </button>
+        </div>
+      </div>
+
+      <!-- URLs Section -->
+      <div class="form-group">
+        <label>URLs</label>
+        <div class="url-list">
+          <div *ngFor="let url of newCard.urls; let i = index; trackBy: trackByIndex" class="url-item">
+            <input
+              type="url"
+              [value]="newCard.urls[i]"
+              (input)="newCard.urls[i] = $any($event.target).value"
+              placeholder="https://example.com"
+            />
+            <button type="button" class="btn-remove" (click)="removeUrl(i, false)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button type="button" class="btn-add" (click)="addUrl(false)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add URL
+        </button>
       </div>
 
       <div class="form-group">
@@ -336,6 +457,18 @@
 
       <div class="view-image" *ngIf="selectedCard?.image_url || selectedCard?.image_data" (click)="onImageClick($event, getImageSource(selectedCard))">
         <img [src]="getImageSource(selectedCard)" [alt]="selectedCard.title" />
+      </div>
+
+      <!-- Additional Images Gallery -->
+      <div class="image-gallery" *ngIf="selectedCard?.image_urls && selectedCard.image_urls.length > 0">
+        <h3>Additional Images</h3>
+        <div class="gallery-grid">
+          <div *ngFor="let imgUrl of selectedCard.image_urls; let i = index" 
+               class="gallery-item"
+               (click)="onImageClick($event, imgUrl)">
+            <img [src]="imgUrl" [alt]="'Image ' + (i + 1)" />
+          </div>
+        </div>
       </div>
 
       <!-- Task-specific fields display -->
@@ -657,9 +790,66 @@
           *ngIf="editImageUploadMethod === 'file'"
           type="file"
           accept="image/*"
+          multiple
           (change)="onFileSelected($event, true)"
           class="file-input"
         />
+
+        <!-- Additional Image URLs -->
+        <div style="margin-top: 1rem;">
+          <label style="font-size: 0.9rem; color: #9ca3af; margin-bottom: 0.5rem; display: block;">Additional Images</label>
+          <div class="url-list">
+            <div *ngFor="let imgUrl of editCard.image_urls; let i = index; trackBy: trackByIndex" class="url-item">
+              <input
+                type="url"
+                [value]="editCard.image_urls[i]"
+                (input)="editCard.image_urls[i] = $any($event.target).value"
+                placeholder="https://example.com/image.jpg"
+              />
+              <button type="button" class="btn-remove" (click)="removeImageUrl(i, true)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn-add" (click)="addImageUrl(true)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add Image URL
+          </button>
+        </div>
+      </div>
+
+      <!-- URLs Section -->
+      <div class="form-group">
+        <label>URLs</label>
+        <div class="url-list">
+          <div *ngFor="let url of editCard.urls; let i = index; trackBy: trackByIndex" class="url-item">
+            <input
+              type="url"
+              [value]="editCard.urls[i]"
+              (input)="editCard.urls[i] = $any($event.target).value"
+              placeholder="https://example.com"
+            />
+            <button type="button" class="btn-remove" (click)="removeUrl(i, true)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button type="button" class="btn-add" (click)="addUrl(true)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add URL
+        </button>
       </div>
 
       <div class="form-group">
