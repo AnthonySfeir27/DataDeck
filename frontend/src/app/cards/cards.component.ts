@@ -11,6 +11,22 @@ import { TagsService } from '../services/tags.service';
 export class CardsComponent implements OnInit {
   cards: any[] = [];
   filteredCards: any[] = [];
+
+  readonly SECTION_ORDER = ['note', 'task', 'movie', 'tv_series', 'book', 'game'];
+  readonly SECTION_LABELS: any = {
+    note: '📝 Notes', task: '✅ Tasks', movie: '🎬 Movies',
+    tv_series: '📺 TV Series', book: '📚 Books', game: '🎮 Games'
+  };
+
+  get cardSections(): { label: string; type: string; cards: any[] }[] {
+    return this.SECTION_ORDER
+      .map(type => ({
+        label: this.SECTION_LABELS[type],
+        type,
+        cards: this.filteredCards.filter(c => (c.master_tag || 'note') === type)
+      }))
+      .filter(s => s.cards.length > 0);
+  }
   availableTags: any[] = [];
   filteredTagsForDisplay: any[] = [];
   filteredTagsForSelector: any[] = [];
@@ -429,7 +445,7 @@ export class CardsComponent implements OnInit {
         game_url: ''
       };
     } else {
-      card.master_tag_data = {};
+      card.master_tag_data = { completed: false };
     }
   }
 

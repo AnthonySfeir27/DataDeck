@@ -3,17 +3,17 @@
   justify-content: center;
   align-items: center;
   min-height: 100%;
-  background-color: #0f1419;
+  background-color: var(--bg-primary);
   padding: 2rem;
 }
 
 .auth-card {
-  background-color: #1a1f2e;
+  background-color: var(--bg-secondary);
   border-radius: 12px;
   padding: 3rem;
   width: 100%;
   max-width: 450px;
-  border: 1px solid #2a3141;
+  border: 1px solid var(--border-color);
 }
 
 .auth-header {
@@ -22,14 +22,14 @@
 }
 
 .auth-header h1 {
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
 .auth-header p {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
@@ -46,41 +46,41 @@
 }
 
 .form-group label {
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 0.9rem;
   font-weight: 500;
 }
 
 .form-group input {
-  background-color: #0f1419;
-  border: 1px solid #2a3141;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.875rem 1rem;
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 0.95rem;
   transition: border-color 0.2s ease;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #60a5fa;
+  border-color: var(--accent-color);
 }
 
 .form-group input::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .error-message {
-  background-color: #7f1d1d;
-  color: #fca5a5;
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
   padding: 0.75rem 1rem;
   border-radius: 8px;
   font-size: 0.9rem;
-  border: 1px solid #991b1b;
+  border: 1px solid var(--danger-border);
 }
 
 .btn-primary {
-  background-color: #60a5fa;
+  background-color: var(--accent-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -92,11 +92,11 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #3b82f6;
+  background-color: var(--accent-hover);
 }
 
 .btn-primary:disabled {
-  background-color: #4b5563;
+  background-color: var(--border-hover);
   cursor: not-allowed;
 }
 
@@ -106,18 +106,18 @@
 }
 
 .auth-footer p {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 .auth-footer a {
-  color: #60a5fa;
+  color: var(--accent-color);
   cursor: pointer;
   text-decoration: none;
   font-weight: 500;
 }
 
 .auth-footer a:hover {
-  color: #3b82f6;
+  color: var(--accent-hover);
   text-decoration: underline;
 }

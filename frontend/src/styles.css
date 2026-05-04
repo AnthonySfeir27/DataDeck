@@ -1,3 +1,62 @@
+/* ===== CSS VARIABLE SYSTEM ===== */
+:root {
+  /* Dark theme (default) */
+  --bg-primary: #0f1419;
+  --bg-secondary: #1a1f2e;
+  --bg-tertiary: #252d3d;
+  --bg-hover: #252d3d;
+  --border-color: #2a3141;
+  --border-hover: #4b5563;
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --accent-color: #60a5fa;
+  --accent-hover: #3b82f6;
+  --accent-bg: #1e3a5f;
+  --danger-color: #dc2626;
+  --danger-hover: #b91c1c;
+  --danger-bg: #7f1d1d;
+  --danger-text: #fca5a5;
+  --danger-border: #991b1b;
+  --input-bg: #0f1419;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --success-color: #10b981;
+  --success-bg: #064e3b;
+  --success-text: #6ee7b7;
+  --scrollbar-track: #1a1f2e;
+  --scrollbar-thumb: #2a3141;
+}
+
+body.light-theme {
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e8ecf1;
+  --bg-hover: #e8ecf1;
+  --border-color: #d1d9e6;
+  --border-hover: #b0bec5;
+  --text-primary: #1a1a2e;
+  --text-secondary: #5a6577;
+  --text-muted: #8896a6;
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-bg: #dbeafe;
+  --danger-color: #dc2626;
+  --danger-hover: #b91c1c;
+  --danger-bg: #fee2e2;
+  --danger-text: #991b1b;
+  --danger-border: #fca5a5;
+  --input-bg: #f0f2f5;
+  --shadow-color: rgba(0, 0, 0, 0.06);
+  --overlay-bg: rgba(0, 0, 0, 0.4);
+  --success-color: #059669;
+  --success-bg: #d1fae5;
+  --success-text: #065f46;
+  --scrollbar-track: #f0f2f5;
+  --scrollbar-thumb: #d1d9e6;
+}
+
+/* ===== GLOBAL RESET ===== */
 * {
   margin: 0;
   padding: 0;
@@ -5,7 +64,29 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: #0f1419;
-  color: #e5e7eb;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
 }

@@ -2,7 +2,8 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background-color: #0f1419;
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease;
 }
 
 .app-container.auth-layout {
@@ -11,82 +12,87 @@
 }
 
 .sidebar {
-  width: 260px;
-  background-color: #1a1f2e;
-  color: white;
+  width: 240px;
+  min-width: 240px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #2a3141;
+  border-right: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .sidebar-header {
-  padding: 2rem 1.5rem;
-  border-bottom: 1px solid #2a3141;
+  padding: 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .sidebar-header h2 {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #60a5fa;
-  letter-spacing: 0.5px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  letter-spacing: 0.3px;
 }
 
 .nav-menu {
   list-style: none;
-  padding: 1.5rem 0;
+  padding: 0.75rem 0;
   margin: 0;
+  flex: 1;
 }
 
 .nav-menu li {
-  margin: 0.25rem 0;
+  margin: 2px 0.5rem;
 }
 
 .nav-menu a {
   display: flex;
   align-items: center;
-  padding: 0.875rem 1.5rem;
-  color: #9ca3af;
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary);
   text-decoration: none;
   transition: all 0.2s ease;
-  border-left: 3px solid transparent;
+  border-radius: 8px;
+  gap: 0.75rem;
 }
 
 .nav-menu a:hover {
-  background-color: #252d3d;
-  color: #e5e7eb;
-  border-left-color: #60a5fa;
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .nav-menu a.active {
-  background-color: #1e3a5f;
-  color: #ffffff;
-  border-left-color: #60a5fa;
+  background-color: var(--accent-bg);
+  color: var(--accent-color);
+  font-weight: 600;
 }
 
 .nav-menu a.active .nav-icon {
-  color: #60a5fa;
+  color: var(--accent-color);
 }
 
 .nav-icon {
   width: 20px;
   height: 20px;
-  margin-right: 1rem;
   flex-shrink: 0;
 }
 
 .nav-text {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
 .main-content {
   flex: 1;
-  background-color: #0f1419;
+  background-color: var(--bg-primary);
   overflow-y: auto;
+  transition: background-color 0.3s ease;
 }
 
 .auth-layout .main-content {
   width: 100%;
 }
-

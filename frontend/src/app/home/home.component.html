@@ -1,3 +1,99 @@
-<div class="welcome-container">
-  <h1 class="welcome-message">{{ welcomeMessage }}</h1>
+<div class="home-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Welcome back, <span class="hero-username">{{ username || 'User' }}</span>
+      </h1>
+      <p class="hero-subtitle">Your personal data organizer — store, tag, and find anything instantly.</p>
+      <div class="hero-actions">
+        <button class="btn-hero-primary" (click)="goToCards()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Create a Card
+        </button>
+        <button class="btn-hero-secondary" (click)="goToTags()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          Manage Tags
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Getting Started Guide -->
+  <div class="guide-section">
+    <h2 class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      How to use DataDeck
+    </h2>
+    <div class="steps-grid">
+      <div class="step-card" *ngFor="let step of steps; let i = index">
+        <div class="step-number">{{ i + 1 }}</div>
+        <div class="step-icon">
+          <!-- Card icon -->
+          <svg *ngIf="step.icon === 'card'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+          </svg>
+          <!-- Tag icon -->
+          <svg *ngIf="step.icon === 'tag'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <!-- Search icon -->
+          <svg *ngIf="step.icon === 'search'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <!-- Theme icon -->
+          <svg *ngIf="step.icon === 'theme'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+          </svg>
+        </div>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Tips -->
+  <div class="tips-section">
+    <h2 class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+        <path d="M9 18h6"></path>
+        <path d="M10 22h4"></path>
+        <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0018 8 6 6 0 006 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 018.91 14"></path>
+      </svg>
+      Quick Tips
+    </h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <span class="tip-emoji">🏷️</span>
+        <p><strong>Master Tags</strong> — Use master tags like "Movie" or "Task" to unlock special fields like deadlines and episode tracking.</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">🖼️</span>
+        <p><strong>Image URLs</strong> — Paste image URLs to give your cards visual thumbnails that show in the grid.</p>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">⬇️</span>
+        <p><strong>Export Data</strong> — Go to Settings → Data & Privacy to download all your cards as a JSON backup.</p>
+      </div>
+    </div>
+  </div>
 </div>

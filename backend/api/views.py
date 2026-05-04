@@ -354,3 +354,143 @@ def delete_tag(request, tag_id):
     return Response({
         'message': 'Tag deleted successfully'
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def update_profile(request):
+    user_id = request.data.get('user_id')
+    username = request.data.get('username')
+    email = request.data.get('email')
+
+    if not user_id:
+        return Response(
+            {'message': 'user_id is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    users = get_collection('users')
+
+    user = users.find_one({'_id': ObjectId(user_id)})
+    if not user:
+        return Response(
+            {'message': 'User not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    update_data = {}
+
+    if username and username != user.get('username'):
+        if users.find_one({'username': username, '_id': {'$ne': ObjectId(user_id)}}):
+            return Response(
+                {'message': 'Username already taken'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        update_data['username'] = username
+
+    if email and email != user.get('email'):
+        if users.find_one({'email': email, '_id': {'$ne': ObjectId(user_id)}}):
+            return Response(
+                {'message': 'Email already taken'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        update_data['email'] = email
+
+    if not update_data:
+        return Response(
+            {'message': 'No changes to update'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    users.update_one(
+        {'_id': ObjectId(user_id)},
+        {'$set': update_data}
+    )
+
+    updated_user = users.find_one({'_id': ObjectId(user_id)})
+
+    return Response({
+        'message': 'Profile updated successfully',
+        'user': {
+            'id': str(updated_user['_id']),
+            'username': updated_user['username'],
+            'email': updated_user['email']
+        }
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def change_password(request):
+    user_id = request.data.get('user_id')
+    current_password = request.data.get('current_password')
+    new_password = request.data.get('new_password')
+
+    if not user_id or not current_password or not new_password:
+        return Response(
+            {'message': 'All fields are required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if len(new_password) < 6:
+        return Response(
+            {'message': 'New password must be at least 6 characters'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    users = get_collection('users')
+
+    user = users.find_one({'_id': ObjectId(user_id)})
+    if not user:
+        return Response(
+            {'message': 'User not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    hashed_current = hashlib.sha256(current_password.encode()).hexdigest()
+    if user['password'] != hashed_current:
+        return Response(
+            {'message': 'Current password is incorrect'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    hashed_new = hashlib.sha256(new_password.encode()).hexdigest()
+    users.update_one(
+        {'_id': ObjectId(user_id)},
+        {'$set': {'password': hashed_new}}
+    )
+
+    return Response({
+        'message': 'Password changed successfully'
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+def delete_account(request):
+    user_id = request.query_params.get('user_id')
+
+    if not user_id:
+        return Response(
+            {'message': 'user_id is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    users = get_collection('users')
+
+    user = users.find_one({'_id': ObjectId(user_id)})
+    if not user:
+        return Response(
+            {'message': 'User not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Delete all user's cards and tags
+    cards = get_collection('cards')
+    tags = get_collection('tags')
+    cards.delete_many({'user_id': user_id})
+    tags.delete_many({'user_id': user_id})
+
+    # Delete the user
+    users.delete_one({'_id': ObjectId(user_id)})
+
+    return Response({
+        'message': 'Account deleted successfully'
+    }, status=status.HTTP_200_OK)

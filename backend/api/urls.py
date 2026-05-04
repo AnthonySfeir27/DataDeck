@@ -12,4 +12,7 @@ urlpatterns = [
     path('tags/', views.get_tags, name='get_tags'),
     path('tags/create/', views.create_tag, name='create_tag'),
     path('tags/<str:tag_id>/delete/', views.delete_tag, name='delete_tag'),
+    path('user/update/', views.update_profile, name='update_profile'),
+    path('user/change-password/', views.change_password, name='change_password'),
+    path('user/delete/', views.delete_account, name='delete_account'),
 ]

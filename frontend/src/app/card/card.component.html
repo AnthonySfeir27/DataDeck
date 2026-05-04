@@ -1,214 +1,122 @@
-<div class="card" (click)="onCardClick()">
-  <div class="card-dates">
-    <span>{{ card.created_at | date:'short' }}</span>
+<div class="card" [class]="'card card--' + (card.master_tag || 'note')" (click)="onCardClick()">
+
+  <!-- Card Type Badge + Date Row -->
+  <div class="card-header-row">
+    <span class="type-badge type-badge--{{ card.master_tag || 'note' }}">
+      <!-- Note -->
+      <svg *ngIf="card.master_tag === 'note' || !card.master_tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+      <!-- Task -->
+      <svg *ngIf="card.master_tag === 'task'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <!-- Movie -->
+      <svg *ngIf="card.master_tag === 'movie'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+      <!-- TV Series -->
+      <svg *ngIf="card.master_tag === 'tv_series'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+      <!-- Book -->
+      <svg *ngIf="card.master_tag === 'book'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      <!-- Game -->
+      <svg *ngIf="card.master_tag === 'game'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="2"></rect></svg>
+      {{ card.master_tag === 'tv_series' ? 'TV' : (card.master_tag || 'note') | titlecase }}
+    </span>
+    <span class="card-date">{{ card.created_at | date:'MMM d' }}</span>
   </div>
-  
-  <!-- Layout WITH image: overlapping title -->
+
+  <!-- Image (if present) -->
   <div class="card-image-container" *ngIf="card.image_url || card.image_data">
-    <div class="card-image" (click)="onImageClick($event)">
-      <img [src]="imageSource" [alt]="card.title" />
+    <img class="card-image-img" [src]="imageSource" [alt]="card.title" (click)="onImageClick($event)" />
+    <div class="image-fade"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="card-body">
+    <h3 class="card-title">{{ card.title }}</h3>
+
+    <!-- NOTE / generic description -->
+    <p class="card-description" *ngIf="card.description && card.master_tag !== 'task'">{{ card.description }}</p>
+
+    <!-- TASK -->
+    <div class="card-meta" *ngIf="card.master_tag === 'task'">
+      <div class="status-badge" [class.status-done]="card.master_tag_data?.completed" [class.status-pending]="!card.master_tag_data?.completed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        {{ card.master_tag_data?.completed ? 'Completed' : 'Pending' }}
+      </div>
+      <div class="meta-row" *ngIf="card.master_tag_data?.deadline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        {{ card.master_tag_data.deadline | date:'MMM d, y' }}
+      </div>
     </div>
-    
-    <div class="image-gradient"></div>
-    
-    <div class="card-overlay-content">
-      <h3 class="card-title">{{ card.title }}</h3>
-      
-      <!-- Task: Show deadline and completion status -->
-      <div *ngIf="card.master_tag === 'task'" class="task-details">
-        <p class="task-deadline-text" *ngIf="card.master_tag_data?.deadline">
-          <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          {{ card.master_tag_data.deadline | date:'medium' }}
-        </p>
-        <div class="task-completion-status">
-          <svg class="task-check-icon" 
-               [class.completed]="card.master_tag_data?.completed"
-               viewBox="0 0 24 24" 
-               fill="none" 
-               stroke="currentColor" 
-               stroke-width="2">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span [class.completed]="card.master_tag_data?.completed">
-            {{ card.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}
-          </span>
-        </div>
+
+    <!-- MOVIE -->
+    <div class="card-meta" *ngIf="card.master_tag === 'movie'">
+      <div class="status-badge" [class.status-done]="card.master_tag_data?.watched" [class.status-pending]="!card.master_tag_data?.watched">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        {{ card.master_tag_data?.watched ? 'Watched' : 'Not Watched' }}
       </div>
-      
-      <!-- Movie: Show watch date and status -->
-      <div *ngIf="card.master_tag === 'movie'" class="task-details">
-        <p class="task-deadline-text" *ngIf="card.master_tag_data?.watch_date">
-          <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          {{ card.master_tag_data.watch_date | date:'medium' }}
-        </p>
-        <div class="task-completion-status">
-          <svg class="task-check-icon" 
-               [class.completed]="card.master_tag_data?.watched"
-               viewBox="0 0 24 24" 
-               fill="none" 
-               stroke="currentColor" 
-               stroke-width="2">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span [class.completed]="card.master_tag_data?.watched">
-            {{ card.master_tag_data?.watched ? 'Watched' : 'Not Watched' }}
-          </span>
-        </div>
+      <div class="rating-row" *ngIf="card.master_tag_data?.rating">
+        <span class="stars">{{ getStars(card.master_tag_data?.rating) }}</span>
+        <span class="rating-text">{{ card.master_tag_data?.rating }}/5</span>
       </div>
-      
-      <!-- TV Series: Show progress -->
-      <div *ngIf="card.master_tag === 'tv_series'" class="task-details">
-        <p class="task-deadline-text">
-          <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
-            <polyline points="17 2 12 7 7 2"></polyline>
-          </svg>
-          {{ card.master_tag_data?.season_count }} Season(s)
-        </p>
-        <div class="task-completion-status">
-          <svg class="task-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 11 12 14 22 4"></polyline>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-          </svg>
+    </div>
+
+    <!-- TV SERIES -->
+    <div class="card-meta" *ngIf="card.master_tag === 'tv_series'">
+      <div class="meta-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+        {{ card.master_tag_data?.season_count || 0 }} Season(s)
+      </div>
+      <div class="progress-block" *ngIf="card.master_tag_data?.season_count">
+        <div class="progress-label">
+          <span>Progress</span>
           <span>{{ getSeriesProgress(card) }}</span>
         </div>
-      </div>
-
-      <!-- Book: Show progress and rating -->
-      <div *ngIf="card.master_tag === 'book'" class="task-details">
-        <p class="task-deadline-text" *ngIf="card.master_tag_data?.pages">
-          <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
-          {{ card.master_tag_data?.current_page || 0 }}/{{ card.master_tag_data?.pages }} pages
-        </p>
-        <div class="task-completion-status">
-          <svg class="task-check-icon" 
-               [class.completed]="card.master_tag_data?.read"
-               viewBox="0 0 24 24" 
-               fill="none" 
-               stroke="currentColor" 
-               stroke-width="2">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span [class.completed]="card.master_tag_data?.read">
-            {{ card.master_tag_data?.read ? 'Read' : 'Not Read' }}
-            <span *ngIf="card.master_tag_data?.rating"> • ⭐ {{ card.master_tag_data?.rating }}/5</span>
-          </span>
-        </div>
-      </div>
-
-      <!-- Game: Show completion and platform -->
-      <div *ngIf="card.master_tag === 'game'" class="task-details">
-        <p class="task-deadline-text" *ngIf="card.master_tag_data?.platform">
-          <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="6" y="4" width="12" height="16" rx="2"></rect>
-            <line x1="12" y1="18" x2="12" y2="18"></line>
-          </svg>
-          {{ card.master_tag_data?.platform }}
-          <span *ngIf="card.master_tag_data?.hours_played"> • {{ card.master_tag_data?.hours_played }}h</span>
-        </p>
-        <div class="task-completion-status">
-          <svg class="task-check-icon" 
-               [class.completed]="card.master_tag_data?.completed"
-               viewBox="0 0 24 24" 
-               fill="none" 
-               stroke="currentColor" 
-               stroke-width="2">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span [class.completed]="card.master_tag_data?.completed">
-            {{ card.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}
-            <span *ngIf="card.master_tag_data?.rating"> • ⭐ {{ card.master_tag_data?.rating }}/5</span>
-          </span>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width]="getSeriesPercent(card) + '%'"></div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Layout WITHOUT image: traditional card content -->
-  <div class="card-content" *ngIf="!(card.image_url || card.image_data)">
-    <h3 class="card-title">{{ card.title }}</h3>
-    
-    <!-- Task: Show deadline and completion status -->
-    <div *ngIf="card.master_tag === 'task'" class="task-details">
-      <p class="task-deadline-text" *ngIf="card.master_tag_data?.deadline">
-        <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        {{ card.master_tag_data.deadline | date:'medium' }}
-      </p>
-      <div class="task-completion-status">
-        <svg class="task-check-icon" 
-             [class.completed]="card.master_tag_data?.completed"
-             viewBox="0 0 24 24" 
-             fill="none" 
-             stroke="currentColor" 
-             stroke-width="2">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        <span [class.completed]="card.master_tag_data?.completed">
-          {{ card.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}
-        </span>
+    <!-- BOOK -->
+    <div class="card-meta" *ngIf="card.master_tag === 'book'">
+      <div class="status-badge" [class.status-done]="card.master_tag_data?.read" [class.status-pending]="!card.master_tag_data?.read">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        {{ card.master_tag_data?.read ? 'Read' : 'Reading' }}
+      </div>
+      <div class="progress-block" *ngIf="card.master_tag_data?.pages">
+        <div class="progress-label">
+          <span>Pages</span>
+          <span>{{ card.master_tag_data?.current_page || 0 }} / {{ card.master_tag_data?.pages }}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width]="getBookPercent(card) + '%'"></div>
+        </div>
+      </div>
+      <div class="rating-row" *ngIf="card.master_tag_data?.rating">
+        <span class="stars">{{ getStars(card.master_tag_data?.rating) }}</span>
+        <span class="rating-text">{{ card.master_tag_data?.rating }}/5</span>
       </div>
     </div>
-    
-    <!-- Regular cards: Show description -->
-    <p class="card-description">
-      {{ card.description }}
-    </p>
-  </div>
-  
-  <div class="card-footer">
-    <div class="card-tags" *ngIf="card.tags && card.tags.length > 0">
-      <span class="tag" *ngFor="let tag of card.tags.slice(0, 3)">{{ tag }}</span>
-      <span class="tag-more" *ngIf="card.tags.length > 3">+{{ card.tags.length - 3 }}</span>
-    </div>
-    
-    <div class="card-footer-right">
-      <!-- Master tag icon -->
-      <svg *ngIf="card.master_tag === 'note'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-        <polyline points="14 2 14 8 20 8"></polyline>
-      </svg>
 
-      <svg *ngIf="card.master_tag === 'task'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="20 6 9 17 4 12"></polyline>
-      </svg>
-
-      <svg *ngIf="card.master_tag === 'movie'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-        <line x1="7" y1="2" x2="7" y2="22"></line>
-        <line x1="17" y1="2" x2="17" y2="22"></line>
-        <line x1="2" y1="12" x2="22" y2="12"></line>
-        <line x1="2" y1="7" x2="7" y2="7"></line>
-        <line x1="2" y1="17" x2="7" y2="17"></line>
-        <line x1="17" y1="17" x2="22" y2="17"></line>
-        <line x1="17" y1="7" x2="22" y2="7"></line>
-      </svg>
-
-      <svg *ngIf="card.master_tag === 'tv_series'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
-        <polyline points="17 2 12 7 7 2"></polyline>
-      </svg>
-
-      <svg *ngIf="card.master_tag === 'book'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-      </svg>
-
-      <svg *ngIf="card.master_tag === 'game'" class="master-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="6" y="4" width="12" height="16" rx="2"></rect>
-        <line x1="12" y1="18" x2="12" y2="18"></line>
-      </svg>
+    <!-- GAME -->
+    <div class="card-meta" *ngIf="card.master_tag === 'game'">
+      <div class="status-badge" [class.status-done]="card.master_tag_data?.completed" [class.status-pending]="!card.master_tag_data?.completed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        {{ card.master_tag_data?.completed ? 'Completed' : 'Playing' }}
+      </div>
+      <div class="meta-row" *ngIf="card.master_tag_data?.platform">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="2"></rect></svg>
+        {{ card.master_tag_data?.platform }}
+        <span *ngIf="card.master_tag_data?.hours_played"> · {{ card.master_tag_data?.hours_played }}h</span>
+      </div>
+      <div class="rating-row" *ngIf="card.master_tag_data?.rating">
+        <span class="stars">{{ getStars(card.master_tag_data?.rating) }}</span>
+        <span class="rating-text">{{ card.master_tag_data?.rating }}/5</span>
+      </div>
     </div>
   </div>
+
+  <!-- Footer: Tags -->
+  <div class="card-footer" *ngIf="card.tags && card.tags.length > 0">
+    <span class="tag" *ngFor="let tag of card.tags.slice(0, 3)">{{ tag }}</span>
+    <span class="tag tag-more" *ngIf="card.tags.length > 3">+{{ card.tags.length - 3 }}</span>
+  </div>
+
 </div>

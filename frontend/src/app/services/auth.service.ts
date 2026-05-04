@@ -46,4 +46,25 @@ export class AuthService {
   isLoggedIn(): boolean {
     return this.currentUser !== null;
   }
+
+  updateProfile(userId: string, username: string, email: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/user/update/`, { user_id: userId, username, email }).pipe(
+      tap((response: any) => {
+        this.currentUser = response.user;
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
+      })
+    );
+  }
+
+  changePassword(userId: string, currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/user/change-password/`, {
+      user_id: userId,
+      current_password: currentPassword,
+      new_password: newPassword
+    });
+  }
+
+  deleteAccount(userId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/user/delete/?user_id=${userId}`);
+  }
 }

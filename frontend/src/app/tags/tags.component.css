@@ -1,6 +1,6 @@
 .tags-container {
   padding: 2rem;
-  background-color: #0f1419;
+  background-color: var(--bg-primary);
   min-height: 100%;
 }
 
@@ -12,7 +12,7 @@
 }
 
 h1 {
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-weight: 600;
   margin: 0;
 }
@@ -23,29 +23,29 @@ h1 {
 
 .search-input {
   width: 100%;
-  background-color: #1a1f2e;
-  border: 1px solid #2a3141;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.875rem 1rem;
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 0.95rem;
   transition: border-color 0.2s ease;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #60a5fa;
+  border-color: var(--accent-color);
 }
 
 .search-input::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .btn-create {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #60a5fa;
+  background-color: var(--accent-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -57,7 +57,7 @@ h1 {
 }
 
 .btn-create:hover {
-  background-color: #3b82f6;
+  background-color: var(--accent-hover);
 }
 
 .btn-create .icon {
@@ -72,8 +72,8 @@ h1 {
 }
 
 .tag-card {
-  background-color: #1a1f2e;
-  border: 1px solid #2a3141;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -83,12 +83,12 @@ h1 {
 }
 
 .tag-card:hover {
-  border-color: #60a5fa;
+  border-color: var(--accent-color);
   transform: translateY(-2px);
 }
 
 .tag-content h3 {
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 1.1rem;
   font-weight: 600;
   margin: 0;
@@ -101,7 +101,7 @@ h1 {
 .btn-delete-tag {
   background: none;
   border: none;
-  color: #dc2626;
+  color: var(--danger-color);
   cursor: pointer;
   padding: 0.5rem;
   display: flex;
@@ -132,19 +132,19 @@ h1 {
 .empty-icon {
   width: 80px;
   height: 80px;
-  color: #4b5563;
+  color: var(--border-hover);
   margin-bottom: 1.5rem;
 }
 
 .empty-state h2 {
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
 }
 
 .empty-state p {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 1rem;
   margin: 0;
 }
@@ -163,11 +163,11 @@ h1 {
 }
 
 .modal-content {
-  background-color: #1a1f2e;
+  background-color: var(--bg-secondary);
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
-  border: 1px solid #2a3141;
+  border: 1px solid var(--border-color);
 }
 
 .modal-header {
@@ -175,11 +175,11 @@ h1 {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #2a3141;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .modal-header h2 {
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
@@ -188,7 +188,7 @@ h1 {
 .btn-close {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0.5rem;
   display: flex;
@@ -198,7 +198,7 @@ h1 {
 }
 
 .btn-close:hover {
-  color: #e5e7eb;
+  color: var(--text-primary);
 }
 
 .btn-close svg {
@@ -220,7 +220,7 @@ h1 {
 
 .form-group label {
   display: block;
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 0.9rem;
   font-weight: 500;
   margin-bottom: 0.5rem;
@@ -228,22 +228,22 @@ h1 {
 
 .form-group input {
   width: 100%;
-  background-color: #0f1419;
-  border: 1px solid #2a3141;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.875rem 1rem;
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 0.95rem;
   transition: border-color 0.2s ease;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #60a5fa;
+  border-color: var(--accent-color);
 }
 
 .form-group input::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .modal-footer {
@@ -251,13 +251,13 @@ h1 {
   justify-content: flex-end;
   gap: 1rem;
   padding: 1.5rem;
-  border-top: 1px solid #2a3141;
+  border-top: 1px solid var(--border-color);
 }
 
 .btn-cancel {
   background-color: transparent;
-  color: #9ca3af;
-  border: 1px solid #2a3141;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
   font-size: 0.95rem;
@@ -267,12 +267,12 @@ h1 {
 }
 
 .btn-cancel:hover {
-  background-color: #2a3141;
-  color: #e5e7eb;
+  background-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 .btn-primary {
-  background-color: #60a5fa;
+  background-color: var(--accent-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -284,6 +284,5 @@ h1 {
 }
 
 .btn-primary:hover {
-  background-color: #3b82f6;
+  background-color: var(--accent-hover);
 }
-

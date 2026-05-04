@@ -9,81 +9,46 @@
     </button>
   </div>
 
-  <!-- Search and Filter -->
+  <!-- Search Only -->
   <div class="search-filter-container">
     <div class="search-box">
-      <input 
-        type="text" 
-        placeholder="Search cards..." 
-        [(ngModel)]="searchQuery"
-        (input)="onSearchChange()"
-        class="search-input"
-      />
-      <select [(ngModel)]="searchFilter" (change)="onFilterChange()" class="filter-select">
-        <option value="all">All Fields</option>
-        <option value="title">Title Only</option>
-        <option value="description">Description Only</option>
-      </select>
-    </div>
-    <div class="tag-filter" *ngIf="availableTags.length > 0">
-      <div class="tag-filter-header">
-        <label>Filter by Tags:</label>
-        <button class="btn-tag-search" (click)="toggleTagFilterSearch()" [class.active]="showTagFilterSearch">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.35-4.35"></path>
-          </svg>
-        </button>
-      </div>
-      <input 
-        *ngIf="showTagFilterSearch"
-        type="text" 
-        placeholder="Search tags..." 
-        [(ngModel)]="tagFilterSearchQuery"
-        (input)="updateFilteredTagsForDisplay()"
-        class="tag-filter-search-input"
-      />
-      <div class="tag-filter-scroll">
-        <div class="tag-filter-list">
-          <button
-            *ngFor="let tag of filteredTagsForDisplay"
-            class="tag-filter-btn"
-            [class.active]="isFilterTagSelected(tag.name)"
-            (click)="toggleFilterTag(tag.name)"
-            [title]="tag.name">
-            {{ truncateTagName(tag.name, 20) }}
-          </button>
-        </div>
-      </div>
+      <svg class="search-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <input type="text" placeholder="Search cards..." [(ngModel)]="searchQuery" (input)="onSearchChange()" class="search-input"/>
     </div>
   </div>
 
-  <div class="cards-grid" *ngIf="filteredCards.length > 0">
-    <app-card 
-      *ngFor="let card of filteredCards" 
-      [card]="card" 
-      (cardClick)="onCardClick($event)"
-      (imageClick)="onImageClickFromCard($event)">
-    </app-card>
-  </div>
+  <!-- Grouped by type -->
+  <ng-container *ngIf="filteredCards.length > 0">
+    <div class="card-section" *ngFor="let section of cardSections">
+      <div class="section-heading">
+        <span class="section-label">{{ section.label }}</span>
+        <span class="section-count">{{ section.cards.length }}</span>
+      </div>
+      <div class="cards-grid">
+        <app-card *ngFor="let card of section.cards" [card]="card"
+          (cardClick)="onCardClick($event)" (imageClick)="onImageClickFromCard($event)">
+        </app-card>
+      </div>
+    </div>
+  </ng-container>
 
   <div class="empty-state" *ngIf="filteredCards.length === 0 && cards.length === 0">
     <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M21 16V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"></path>
       <polyline points="7 10 12 13 17 10"></polyline>
     </svg>
-    <h2>No cards yet</h2>
-    <p>Create your first card to get started</p>
+    <h2>No cards yet</h2><p>Create your first card to get started</p>
   </div>
 
   <div class="empty-state" *ngIf="filteredCards.length === 0 && cards.length > 0">
     <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="11" cy="11" r="8"></circle>
-      <path d="m21 21-4.35-4.35"></path>
+      <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path>
     </svg>
-    <h2>No cards found</h2>
-    <p>Try adjusting your search or filters</p>
+    <h2>No cards found</h2><p>Try adjusting your search</p>
   </div>
+
 </div>
 
 <!-- Create Modal -->
@@ -534,99 +499,76 @@
         </div>
       </div>
 
-      <!-- Task-specific fields display -->
+      <!-- NOTE status -->
+      <div class="view-section" *ngIf="!selectedCard?.master_tag || selectedCard?.master_tag === 'note'">
+        <div class="view-status-row">
+          <label class="checkbox-toggle">
+            <input type="checkbox" [(ngModel)]="selectedCard.master_tag_data.completed" (change)="onTaskCompletionToggle()"/>
+            <span class="checkbox-custom"><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+            <span class="checkbox-label">{{ selectedCard?.master_tag_data?.completed ? 'Done' : 'Not Done' }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- TASK details -->
       <div class="view-section" *ngIf="selectedCard?.master_tag === 'task'">
-        <h3>Task Details</h3>
-        <div class="task-info">
-          <div class="task-status-toggle">
-            <label class="checkbox-toggle">
-              <input 
-                type="checkbox" 
-                [(ngModel)]="selectedCard.master_tag_data.completed"
-                (change)="onTaskCompletionToggle()"
-              />
-              <span class="checkbox-custom">
-                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </span>
-              <span class="checkbox-label">{{ selectedCard?.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}</span>
-            </label>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.deadline">
-            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <span>Deadline: {{ selectedCard?.master_tag_data?.deadline | date:'medium' }}</span>
-          </div>
+        <div class="view-status-row">
+          <label class="checkbox-toggle">
+            <input type="checkbox" [(ngModel)]="selectedCard.master_tag_data.completed" (change)="onTaskCompletionToggle()"/>
+            <span class="checkbox-custom"><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+            <span class="checkbox-label">{{ selectedCard?.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}</span>
+          </label>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.deadline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Deadline: <strong>{{ selectedCard?.master_tag_data?.deadline | date:'mediumDate' }}</strong>
         </div>
       </div>
 
-      <!-- Movie-specific fields display -->
+      <!-- MOVIE details -->
       <div class="view-section" *ngIf="selectedCard?.master_tag === 'movie'">
-        <h3>Movie Details</h3>
-        <div class="task-info">
-          <div class="task-status-toggle">
-            <label class="checkbox-toggle">
-              <input 
-                type="checkbox" 
-                [(ngModel)]="selectedCard.master_tag_data.watched"
-                (change)="onTaskCompletionToggle()"
-              />
-              <span class="checkbox-custom">
-                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </span>
-              <span class="checkbox-label">{{ selectedCard?.master_tag_data?.watched ? 'Watched' : 'Not Watched' }}</span>
-            </label>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.watch_date">
-            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <span>Watched on: {{ selectedCard?.master_tag_data?.watch_date | date:'medium' }}</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.movie_url">
-            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
-            <a [href]="selectedCard.master_tag_data.movie_url" target="_blank" class="movie-link">View Movie</a>
-          </div>
+        <div class="view-status-row">
+          <label class="checkbox-toggle">
+            <input type="checkbox" [(ngModel)]="selectedCard.master_tag_data.watched" (change)="onTaskCompletionToggle()"/>
+            <span class="checkbox-custom"><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+            <span class="checkbox-label">{{ selectedCard?.master_tag_data?.watched ? 'Watched' : 'Not Watched' }}</span>
+          </label>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.watch_date">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Watched: <strong>{{ selectedCard?.master_tag_data?.watch_date | date:'mediumDate' }}</strong>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.rating">
+          <span class="view-stars">{{ 'â˜…'.repeat(selectedCard.master_tag_data.rating) }}{{ 'â˜†'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
+          <span>{{ selectedCard.master_tag_data.rating }}/5</span>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.movie_url">
+          <a [href]="selectedCard.master_tag_data.movie_url" target="_blank" class="view-link">ðŸ”— View Movie</a>
         </div>
       </div>
 
-      <!-- TV Series-specific fields display -->
+      <!-- TV SERIES details -->
       <div class="view-section" *ngIf="selectedCard?.master_tag === 'tv_series'">
-        <h3>TV Series Details</h3>
-        <div class="task-info">
-          <div class="task-deadline">
-            <span>{{ selectedCard?.master_tag_data?.season_count }} Season(s)</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.series_url">
-            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
-            <a [href]="selectedCard.master_tag_data.series_url" target="_blank" class="movie-link">View Series</a>
-          </div>
+        <div class="view-info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+          <strong>{{ selectedCard?.master_tag_data?.season_count }} Season(s)</strong>
         </div>
-
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.series_url">
+          <a [href]="selectedCard.master_tag_data.series_url" target="_blank" class="view-link">ðŸ”— View Series</a>
+        </div>
         <div class="episodes-tracker-view">
           <div *ngFor="let season of selectedCard?.master_tag_data?.watched_episodes; let s = index" class="season-tracker-view">
-            <h4>Season {{ s + 1 }} ({{ getWatchedCount(season.episodes) }}/{{ season.episodes.length }} watched)</h4>
+            <div class="season-header-view">
+              <span>Season {{ s + 1 }}</span>
+              <span class="season-progress-text">{{ getWatchedCount(season.episodes) }}/{{ season.episodes.length }} watched</span>
+            </div>
+            <div class="season-progress-bar">
+              <div class="season-progress-fill" [style.width]="(getWatchedCount(season.episodes) / season.episodes.length * 100) + '%'"></div>
+            </div>
             <div class="episodes-grid-view">
-              <div *ngFor="let watched of season.episodes; let e = index" 
-                   class="episode-checkbox-view"
+              <div *ngFor="let watched of season.episodes; let e = index"
+                   class="episode-checkbox-view" [class.ep-watched]="watched"
                    (click)="toggleViewEpisode(s, e)">
-                <input
-                  type="checkbox"
-                  [checked]="selectedCard.master_tag_data.watched_episodes[s].episodes[e]"
-                  readonly
-                />
                 <span>{{ e + 1 }}</span>
               </div>
             </div>
@@ -634,90 +576,73 @@
         </div>
       </div>
 
+      <!-- BOOK details -->
       <div class="view-section" *ngIf="selectedCard?.master_tag === 'book'">
-        <h3>Book Details</h3>
-        <div class="task-info">
-          <div class="task-completion">
-            <svg class="task-check-icon" [class.completed]="selectedCard?.master_tag_data?.read" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span [class.completed]="selectedCard?.master_tag_data?.read">
-              {{ selectedCard?.master_tag_data?.read ? 'Read' : 'Not Read' }}
-            </span>
+        <div class="view-status-row">
+          <label class="checkbox-toggle">
+            <input type="checkbox" [(ngModel)]="selectedCard.master_tag_data.read" (change)="onTaskCompletionToggle()"/>
+            <span class="checkbox-custom"><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+            <span class="checkbox-label">{{ selectedCard?.master_tag_data?.read ? 'Read' : 'Not Read' }}</span>
+          </label>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.pages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          Pages: <strong>{{ selectedCard?.master_tag_data?.current_page || 0 }} / {{ selectedCard?.master_tag_data?.pages }}</strong>
+          <div class="view-progress-bar">
+            <div class="view-progress-fill" [style.width]="((selectedCard?.master_tag_data?.current_page || 0) / selectedCard?.master_tag_data?.pages * 100) + '%'"></div>
           </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.read_date">
-            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <span>Finished: {{ selectedCard?.master_tag_data?.read_date | date:'medium' }}</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.pages">
-            <span>{{ selectedCard?.master_tag_data?.current_page || 0 }} / {{ selectedCard?.master_tag_data?.pages }} pages</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.rating">
-            <span>⭐ {{ selectedCard?.master_tag_data?.rating }} / 5</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.book_url">
-            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
-            <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.book_url)" target="_blank" class="movie-link">View Book</a>
-          </div>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.read_date">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Finished: <strong>{{ selectedCard?.master_tag_data?.read_date | date:'mediumDate' }}</strong>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.rating">
+          <span class="view-stars">{{ 'â˜…'.repeat(selectedCard.master_tag_data.rating) }}{{ 'â˜†'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
+          <span>{{ selectedCard.master_tag_data.rating }}/5</span>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.book_url">
+          <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.book_url)" target="_blank" class="view-link">ðŸ”— View Book</a>
         </div>
       </div>
 
+      <!-- GAME details -->
       <div class="view-section" *ngIf="selectedCard?.master_tag === 'game'">
-        <h3>Game Details</h3>
-        <div class="task-info">
-          <div class="task-completion">
-            <svg class="task-check-icon" [class.completed]="selectedCard?.master_tag_data?.completed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span [class.completed]="selectedCard?.master_tag_data?.completed">
-              {{ selectedCard?.master_tag_data?.completed ? 'Completed' : 'Not Completed' }}
-            </span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.completion_date">
-            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <span>Completed: {{ selectedCard?.master_tag_data?.completion_date | date:'medium' }}</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.hours_played">
-            <span>⏱️ {{ selectedCard?.master_tag_data?.hours_played }} hours played</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.platform">
-            <span>🎮 {{ selectedCard?.master_tag_data?.platform }}</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.rating">
-            <span>⭐ {{ selectedCard?.master_tag_data?.rating }} / 5</span>
-          </div>
-          <div class="task-deadline" *ngIf="selectedCard?.master_tag_data?.game_url">
-            <svg class="deadline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
-            <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.game_url)" target="_blank" class="movie-link">View Game</a>
-          </div>
+        <div class="view-status-row">
+          <label class="checkbox-toggle">
+            <input type="checkbox" [(ngModel)]="selectedCard.master_tag_data.completed" (change)="onTaskCompletionToggle()"/>
+            <span class="checkbox-custom"><svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+            <span class="checkbox-label">{{ selectedCard?.master_tag_data?.completed ? 'Completed' : 'Playing' }}</span>
+          </label>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.platform">
+          ðŸŽ® Platform: <strong>{{ selectedCard?.master_tag_data?.platform }}</strong>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.hours_played">
+          â±ï¸ <strong>{{ selectedCard?.master_tag_data?.hours_played }}h</strong> played
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.completion_date">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Completed: <strong>{{ selectedCard?.master_tag_data?.completion_date | date:'mediumDate' }}</strong>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.rating">
+          <span class="view-stars">{{ 'â˜…'.repeat(selectedCard.master_tag_data.rating) }}{{ 'â˜†'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
+          <span>{{ selectedCard.master_tag_data.rating }}/5</span>
+        </div>
+        <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.game_url">
+          <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.game_url)" target="_blank" class="view-link">ðŸ”— View Game</a>
         </div>
       </div>
 
       <div class="view-section" *ngIf="selectedCard?.description">
         <h3>Description</h3>
-        <p>{{ selectedCard.description }}</p>
+        <p class="view-description">{{ selectedCard.description }}</p>
       </div>
 
       <div class="view-section" *ngIf="selectedCard?.urls && selectedCard.urls.length > 0">
         <h3>URLs</h3>
         <div class="urls-list">
           <a *ngFor="let url of selectedCard.urls" [href]="ensureHttpProtocol(url)" target="_blank" rel="noopener noreferrer" class="url-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
             {{ url }}
           </a>
         </div>
@@ -728,10 +653,6 @@
         <div class="tags-list">
           <span class="tag" *ngFor="let tag of selectedCard.tags">{{ tag }}</span>
         </div>
-      </div>
-      <div class="view-section" *ngIf="selectedCard?.master_tag">
-        <h3>Card Type</h3>
-        <span class="master-tag">{{ getMasterTagName(selectedCard.master_tag) }}</span>
       </div>
     </div>
 
