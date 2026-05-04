@@ -31,7 +31,14 @@
     <h3 class="card-title">{{ card.title }}</h3>
 
     <!-- NOTE / generic description -->
+    <div class="card-meta" *ngIf="!card.master_tag || card.master_tag === 'note'">
+      <div class="status-badge" [class.status-done]="card.master_tag_data?.completed" [class.status-pending]="!card.master_tag_data?.completed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        {{ card.master_tag_data?.completed ? 'Done' : 'Active' }}
+      </div>
+    </div>
     <p class="card-description" *ngIf="card.description && card.master_tag !== 'task'">{{ card.description }}</p>
+
 
     <!-- TASK -->
     <div class="card-meta" *ngIf="card.master_tag === 'task'">
