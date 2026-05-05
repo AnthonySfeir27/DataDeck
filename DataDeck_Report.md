@@ -210,6 +210,24 @@ frontend/src/app/
 
 ## 6. Task Repartition
 
+Each student is responsible for at least two MongoDB collections (tables) and develops both the Django backend models/controllers and Angular frontend pages for their assigned features.
+
+### Anthony Sfeir – 60622
+**Collections:** Users, Cards (2 tables)
+- **Backend Models:** `user_model.py` (User schema, password hashing, query helpers), `card_model.py` (Card schema, serialization, timestamp helpers)
+- **Backend Controllers:** `auth_controller.py` (Login, Signup), `card_controller.py` (CRUD), `user_controller.py` (Profile)
+- **Frontend Pages:** Login page, Signup page, Account page (profile update, password change)
+- **Features:** Image upload & viewing, Reactive Forms & Validators
+
+### Ihab Haydaw – 59027
+**Collections:** Tags, Cards (2 tables)
+- **Backend Models:** `tag_model.py` (Tag schema, serialization), `card_model.py` (co-developed card schema extensions for master_tag_data)
+- **Backend Controllers:** `tag_controller.py` (Tags CRUD), `home_controller.py` (Welcome)
+- **Frontend Pages:** Card Dashboard (modals, search, filters), Tags page, Settings page, Home page
+- **Features:** PDF upload & viewing, Card-preview component, Theme management (dark/light mode)
+
+### Detailed Task Table
+
 | Task                                    | Student               |
 |-----------------------------------------|-----------------------|
 | Backend setup (Django, MongoDB connection) | Anthony Sfeir – 60622 |
