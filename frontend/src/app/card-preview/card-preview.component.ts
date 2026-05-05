@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
 
 @Component({
-  selector: 'app-card',
-  templateUrl: './card.component.html',
-  styleUrls: ['./card.component.css']
+  selector: 'app-card-preview',
+  templateUrl: './card-preview.component.html',
+  styleUrls: ['./card-preview.component.css']
 })
-export class CardComponent implements OnInit, OnChanges {
+export class CardPreviewComponent implements OnInit, OnChanges {
   @Input() card: any;
   @Output() cardClick = new EventEmitter<any>();
   @Output() imageClick = new EventEmitter<string>();

@@ -78,11 +78,19 @@ backend/
 │   ├── settings.py      # MongoDB URI, CORS, REST config
 │   ├── urls.py          # Root URL: api/ → api.urls
 │   └── wsgi.py
-├── api/                 # Main API application
-│   ├── db.py            # MongoDB connection helper (PyMongo)
-│   ├── models.py        # (Unused – MongoDB handles schemas)
-│   ├── urls.py          # API route definitions
-│   └── views.py         # All API view functions (CRUD)
+├── api/                         # Main API application
+│   ├── db.py                    # MongoDB connection helper (PyMongo)
+│   ├── models/                  # Model layer (1 model per file)
+│   │   ├── user_model.py        # User schema, hashing, lookups
+│   │   ├── card_model.py        # Card schema, serialization, timestamps
+│   │   └── tag_model.py         # Tag schema, serialization
+│   ├── controllers/             # Controller layer (1 per screen)
+│   │   ├── auth_controller.py   # Powers Login + Signup screens
+│   │   ├── card_controller.py   # Powers Card Dashboard screen
+│   │   ├── tag_controller.py    # Powers Tag Manager screen
+│   │   ├── user_controller.py   # Powers Account screen
+│   │   └── home_controller.py   # Powers Home screen
+│   └── urls.py                  # API route definitions
 ├── .env                 # MONGODB_URI environment variable
 └── requirements.txt     # Dependencies
 ```
@@ -94,6 +102,14 @@ frontend/src/app/
 ├── app.module.ts              # Root module (FormsModule, ReactiveFormsModule, HttpClient)
 ├── app-routing.module.ts      # Angular Router with 7 routes
 ├── app.component.*            # Shell layout with sidebar navigation
+│
+├── models/                        # TypeScript model interfaces (1 per file)
+│   ├── card.model.ts              # Card interface
+│   ├── user.model.ts              # User interface
+│   └── tag.model.ts               # Tag interface
+│
+├── helpers/                       # Shared helper functions
+│   └── card-form.helper.ts        # Card factory: createEmptyCard, createEditCardFromSource, buildCardPayload
 │
 ├── login/                     # Login page (Reactive Form + Validators)
 │   ├── login.component.ts
@@ -108,13 +124,15 @@ frontend/src/app/
 ├── home/                      # Welcome/landing page
 │   └── home.component.*
 │
-├── cards/                     # Main cards CRUD page (search, filter, modals)
-│   ├── cards.component.ts     # Card management logic, PDF handling
-│   ├── cards.component.html   # Create/Edit/View modals, PDF viewer
-│   └── cards.component.css
+├── card-dashboard/            # Card management screen (search, filter, CRUD modals)
+│   ├── card-dashboard.component.ts
+│   ├── card-dashboard.component.html
+│   └── card-dashboard.component.css
 │
-├── card/                      # Reusable card display component
-│   └── card.component.*
+├── card-preview/              # Reusable card preview widget (grid thumbnail)
+│   ├── card-preview.component.ts
+│   ├── card-preview.component.html
+│   └── card-preview.component.css
 │
 ├── tags/                      # Tags management page
 │   └── tags.component.*

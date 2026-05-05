@@ -27,9 +27,9 @@
         <span class="section-count">{{ section.cards.length }}</span>
       </div>
       <div class="cards-grid">
-        <app-card *ngFor="let card of section.cards" [card]="card"
+        <app-card-preview *ngFor="let card of section.cards" [card]="card"
           (cardClick)="onCardClick($event)" (imageClick)="onImageClickFromCard($event)">
-        </app-card>
+        </app-card-preview>
       </div>
     </div>
   </ng-container>
