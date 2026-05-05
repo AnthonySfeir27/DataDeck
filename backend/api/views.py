@@ -137,6 +137,8 @@ def create_card(request):
         'image_urls': image_urls,
         'urls': urls,
         'master_tag_data': master_tag_data,
+        'document_data': request.data.get('document_data', ''),
+        'document_name': request.data.get('document_name', ''),
         'created_at': datetime.utcnow().isoformat(),
         'updated_at': datetime.utcnow().isoformat()
     }
@@ -156,6 +158,8 @@ def create_card(request):
             'image_urls': image_urls,
             'urls': urls,
             'master_tag_data': master_tag_data,
+            'document_data': card_data['document_data'],
+            'document_name': card_data['document_name'],
             'created_at': card_data['created_at'],
             'updated_at': card_data['updated_at']
         }
@@ -187,6 +191,8 @@ def get_cards(request):
             'image_data': card.get('image_data'),
             'urls': card.get('urls', []),
             'master_tag_data': card.get('master_tag_data', {}),
+            'document_data': card.get('document_data', ''),
+            'document_name': card.get('document_name', ''),
             'created_at': card.get('created_at'),
             'updated_at': card.get('updated_at')
         })
@@ -226,6 +232,8 @@ def update_card(request, card_id):
         'image_urls': image_urls,
         'urls': urls,
         'master_tag_data': master_tag_data,
+        'document_data': request.data.get('document_data', ''),
+        'document_name': request.data.get('document_name', ''),
         'updated_at': datetime.utcnow().isoformat()
     }
 
@@ -253,6 +261,8 @@ def update_card(request, card_id):
             'image_urls': image_urls,
             'urls': urls,
             'master_tag_data': master_tag_data,
+            'document_data': update_data.get('document_data', ''),
+            'document_name': update_data.get('document_name', ''),
             'updated_at': update_data['updated_at']
         }
     }, status=status.HTTP_200_OK)

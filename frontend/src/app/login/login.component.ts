@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
@@ -7,27 +8,38 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
-  usernameOrEmail: string = '';
-  password: string = '';
+export class LoginComponent implements OnInit {
+  loginForm!: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
 
   constructor(
+    private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {}
 
+  ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      usernameOrEmail: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
+
   onLogin(): void {
-    if (!this.usernameOrEmail || !this.password) {
-      this.errorMessage = 'Please fill in all fields';
+    // Mark all fields as touched to show validation errors
+    this.loginForm.markAllAsTouched();
+
+    if (this.loginForm.invalid) {
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.usernameOrEmail, this.password).subscribe({
+    const { usernameOrEmail, password } = this.loginForm.value;
+
+    this.authService.login(usernameOrEmail, password).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.router.navigate(['/home']);

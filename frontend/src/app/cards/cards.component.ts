@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CardsService } from '../services/cards.service';
 import { AuthService } from '../services/auth.service';
 import { TagsService } from '../services/tags.service';
@@ -43,9 +44,11 @@ export class CardsComponent implements OnInit {
   showEditModal: boolean = false;
   showTagSelectorModal: boolean = false;
   showImageViewerModal: boolean = false;
+  showDocumentViewerModal: boolean = false;
   showTagFilterSearch: boolean = false;
   selectedCard: any = null;
   selectedImage: string = '';
+  selectedDocumentUrl: SafeResourceUrl = '';
   imageUploadMethod: string = 'url';
   editImageUploadMethod: string = 'url';
   isEditingCard: boolean = false;
@@ -64,7 +67,9 @@ export class CardsComponent implements OnInit {
     tags: [] as string[],
     master_tag: '',
     urls: [] as string[],
-    master_tag_data: {} as any
+    master_tag_data: {} as any,
+    document_data: '',
+    document_name: ''
   };
   editCard = {
     id: '',
@@ -76,13 +81,16 @@ export class CardsComponent implements OnInit {
     tags: [] as string[],
     master_tag: '',
     urls: [] as string[],
-    master_tag_data: {} as any
+    master_tag_data: {} as any,
+    document_data: '',
+    document_name: ''
   };
 
   constructor(
     private cardsService: CardsService,
     private authService: AuthService,
-    private tagsService: TagsService
+    private tagsService: TagsService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -272,7 +280,9 @@ export class CardsComponent implements OnInit {
       tags: [],
       master_tag: '',
       urls: [],
-      master_tag_data: {}
+      master_tag_data: {},
+      document_data: '',
+      document_name: ''
     };
     this.imageUploadMethod = 'url';
   }
@@ -293,7 +303,9 @@ export class CardsComponent implements OnInit {
       tags: [...(this.selectedCard.tags || [])],
       master_tag: this.selectedCard.master_tag || 'note',
       urls: [...(this.selectedCard.urls || [])],
-      master_tag_data: JSON.parse(JSON.stringify(this.selectedCard.master_tag_data || {}))
+      master_tag_data: JSON.parse(JSON.stringify(this.selectedCard.master_tag_data || {})),
+      document_data: this.selectedCard.document_data || '',
+      document_name: this.selectedCard.document_name || ''
     };
     this.editImageUploadMethod = this.selectedCard.image_data ? 'file' : 'url';
     this.showViewModal = false;
@@ -312,7 +324,9 @@ export class CardsComponent implements OnInit {
       tags: [],
       master_tag: '',
       urls: [],
-      master_tag_data: {}
+      master_tag_data: {},
+      document_data: '',
+      document_name: ''
     };
     this.editImageUploadMethod = 'url';
   }
@@ -475,6 +489,8 @@ export class CardsComponent implements OnInit {
       urls: this.newCard.urls,
       image_urls: this.newCard.image_urls || [],
       master_tag_data: this.newCard.master_tag_data,
+      document_data: this.newCard.document_data || '',
+      document_name: this.newCard.document_name || '',
       user_id: user.id
     };
 
@@ -522,7 +538,9 @@ export class CardsComponent implements OnInit {
       master_tag: this.editCard.master_tag,
       urls: this.editCard.urls,
       image_urls: this.editCard.image_urls || [],
-      master_tag_data: this.editCard.master_tag_data
+      master_tag_data: this.editCard.master_tag_data,
+      document_data: this.editCard.document_data || '',
+      document_name: this.editCard.document_name || ''
     };
 
     if (this.editImageUploadMethod === 'url') {
@@ -705,6 +723,46 @@ export class CardsComponent implements OnInit {
     } else {
       this.newCard.image_urls.splice(index, 1);
     }
+  }
+
+  // Document (PDF) handling
+  onDocumentSelected(event: any, isEdit: boolean = false): void {
+    const file = event.target.files?.[0];
+    if (file && file.type === 'application/pdf') {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        if (isEdit) {
+          this.editCard.document_data = e.target.result;
+          this.editCard.document_name = file.name;
+        } else {
+          this.newCard.document_data = e.target.result;
+          this.newCard.document_name = file.name;
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert('Please select a PDF file');
+    }
+  }
+
+  removeDocument(isEdit: boolean = false): void {
+    if (isEdit) {
+      this.editCard.document_data = '';
+      this.editCard.document_name = '';
+    } else {
+      this.newCard.document_data = '';
+      this.newCard.document_name = '';
+    }
+  }
+
+  openDocumentViewer(documentData: string): void {
+    this.selectedDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(documentData);
+    this.showDocumentViewerModal = true;
+  }
+
+  closeDocumentViewer(): void {
+    this.showDocumentViewerModal = false;
+    this.selectedDocumentUrl = '';
   }
 
   onTaskCompletionToggle(): void {

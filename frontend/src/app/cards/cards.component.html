@@ -396,6 +396,42 @@
         </div>
       </div>
 
+      <!-- Document (PDF) Upload -->
+      <div class="form-group">
+        <label>Document (PDF)</label>
+        <div class="document-upload-area" *ngIf="!newCard.document_data">
+          <input
+            type="file"
+            accept=".pdf,application/pdf"
+            (change)="onDocumentSelected($event, false)"
+            class="file-input"
+            id="doc-upload-create"
+          />
+          <label for="doc-upload-create" class="document-upload-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span>Click to upload a PDF document</span>
+          </label>
+        </div>
+        <div class="document-attached" *ngIf="newCard.document_data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span class="doc-name">{{ newCard.document_name }}</span>
+          <button type="button" class="btn-remove-doc" (click)="removeDocument(false)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <!-- URLs Section -->
       <div class="form-group">
         <label>URLs</label>
@@ -652,6 +688,20 @@
         <h3>Tags</h3>
         <div class="tags-list">
           <span class="tag" *ngFor="let tag of selectedCard.tags">{{ tag }}</span>
+        </div>
+      </div>
+
+      <!-- Attached Document -->
+      <div class="view-section" *ngIf="selectedCard?.document_data">
+        <h3>Attached Document</h3>
+        <div class="document-view-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span class="doc-name">{{ selectedCard.document_name || 'Document.pdf' }}</span>
+          <button class="btn-view-doc" (click)="openDocumentViewer(selectedCard.document_data)">View PDF</button>
+          <a [href]="selectedCard.document_data" [download]="selectedCard.document_name || 'document.pdf'" class="btn-download-doc">Download</a>
         </div>
       </div>
     </div>
@@ -1020,6 +1070,42 @@
         </div>
       </div>
 
+      <!-- Document (PDF) Upload for Edit -->
+      <div class="form-group">
+        <label>Document (PDF)</label>
+        <div class="document-upload-area" *ngIf="!editCard.document_data">
+          <input
+            type="file"
+            accept=".pdf,application/pdf"
+            (change)="onDocumentSelected($event, true)"
+            class="file-input"
+            id="doc-upload-edit"
+          />
+          <label for="doc-upload-edit" class="document-upload-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span>Click to upload a PDF document</span>
+          </label>
+        </div>
+        <div class="document-attached" *ngIf="editCard.document_data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span class="doc-name">{{ editCard.document_name }}</span>
+          <button type="button" class="btn-remove-doc" (click)="removeDocument(true)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <!-- URLs Section -->
       <div class="form-group">
         <label>URLs</label>
@@ -1141,5 +1227,20 @@
       </svg>
     </button>
     <img [src]="selectedImage" alt="Full size image" />
+  </div>
+</div>
+
+<!-- Document (PDF) Viewer Modal -->
+<div class="modal-overlay" *ngIf="showDocumentViewerModal" (click)="closeDocumentViewer()">
+  <div class="document-viewer-content" (click)="$event.stopPropagation()">
+    <div class="document-viewer-header">
+      <h3>Document Viewer</h3>
+      <button class="btn-close-viewer" (click)="closeDocumentViewer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <iframe [src]="selectedDocumentUrl" class="pdf-iframe"></iframe>
   </div>
 </div>

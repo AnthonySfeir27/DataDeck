@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
@@ -7,38 +8,39 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
-export class SignupComponent {
-  username: string = '';
-  email: string = '';
-  password: string = '';
+export class SignupComponent implements OnInit {
+  signupForm!: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
 
   constructor(
+    private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {}
 
+  ngOnInit(): void {
+    this.signupForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
+
   onSignup(): void {
-    if (!this.username || !this.email || !this.password) {
-      this.errorMessage = 'Please fill in all fields';
-      return;
-    }
+    // Mark all fields as touched to show validation errors
+    this.signupForm.markAllAsTouched();
 
-    if (!this.isValidEmail(this.email)) {
-      this.errorMessage = 'Please enter a valid email address';
-      return;
-    }
-
-    if (this.password.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters';
+    if (this.signupForm.invalid) {
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.signup(this.username, this.email, this.password).subscribe({
+    const { username, email, password } = this.signupForm.value;
+
+    this.authService.signup(username, email, password).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.router.navigate(['/home']);
@@ -48,11 +50,6 @@ export class SignupComponent {
         this.errorMessage = error.error?.message || 'Signup failed. Please try again.';
       }
     });
-  }
-
-  isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
 
   goToLogin(): void {

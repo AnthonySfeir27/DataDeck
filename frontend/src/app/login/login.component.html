@@ -5,17 +5,19 @@
       <p>Log in to your DataDeck account</p>
     </div>
 
-    <form class="auth-form" (ngSubmit)="onLogin()">
+    <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
       <div class="form-group">
         <label for="usernameOrEmail">Username or Email</label>
         <input
           type="text"
           id="usernameOrEmail"
-          [(ngModel)]="usernameOrEmail"
-          name="usernameOrEmail"
+          formControlName="usernameOrEmail"
           placeholder="Enter your username or email"
-          required
+          [class.input-error]="loginForm.get('usernameOrEmail')?.invalid && loginForm.get('usernameOrEmail')?.touched"
         />
+        <div class="validation-error" *ngIf="loginForm.get('usernameOrEmail')?.invalid && loginForm.get('usernameOrEmail')?.touched">
+          <span *ngIf="loginForm.get('usernameOrEmail')?.errors?.['required']">Username or email is required</span>
+        </div>
       </div>
 
       <div class="form-group">
@@ -23,11 +25,14 @@
         <input
           type="password"
           id="password"
-          [(ngModel)]="password"
-          name="password"
+          formControlName="password"
           placeholder="Enter your password"
-          required
+          [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
         />
+        <div class="validation-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+        </div>
       </div>
 
       <div class="error-message" *ngIf="errorMessage">
