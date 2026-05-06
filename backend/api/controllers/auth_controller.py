@@ -1,9 +1,3 @@
-"""
-Auth Controller
----------------
-Powers: Login Screen, Signup Screen
-Main functions handle flow (validation → model calls → response → errors).
-"""
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
