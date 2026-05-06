@@ -212,14 +212,14 @@ frontend/src/app/
 
 Each student is responsible for at least two MongoDB collections (tables) and develops both the Django backend models/controllers and Angular frontend pages for their assigned features.
 
-### Anthony Sfeir – 60622
+### Ihab Haydaw – 59027
 **Collections:** Users, Cards (2 tables)
 - **Backend Models:** `user_model.py` (User schema, password hashing, query helpers), `card_model.py` (Card schema, serialization, timestamp helpers)
 - **Backend Controllers:** `auth_controller.py` (Login, Signup), `card_controller.py` (CRUD), `user_controller.py` (Profile)
 - **Frontend Pages:** Login page, Signup page, Account page (profile update, password change)
 - **Features:** Image upload & viewing, Reactive Forms & Validators
 
-### Ihab Haydaw – 59027
+### Anthony Sfeir – 60622
 **Collections:** Tags, Cards (2 tables)
 - **Backend Models:** `tag_model.py` (Tag schema, serialization), `card_model.py` (co-developed card schema extensions for master_tag_data)
 - **Backend Controllers:** `tag_controller.py` (Tags CRUD), `home_controller.py` (Welcome)
@@ -231,14 +231,14 @@ Each student is responsible for at least two MongoDB collections (tables) and de
 | Task                                    | Student               |
 |-----------------------------------------|-----------------------|
 | Backend setup (Django, MongoDB connection) | Ihab Haydaw – 59027 |
-| User authentication (login/signup API)  | Anthony Sfeir – 60622 |
+| User authentication (login/signup API)  | Ihab Haydaw – 59027 |
 | Cards CRUD API (create, read, update, delete) | Anthony Sfeir – 60622 |
-| Tags API and tag management             | Ihab Haydaw – 59027   |
-| Angular frontend components & routing   | Ihab Haydaw – 59027   |
+| Tags API and tag management             | Anthony Sfeir – 60622   |
+| Angular frontend components & routing   | Anthony Sfeir – 60622   |
 | Cards page UI (modals, search, filters) | Ihab Haydaw – 59027   |
 | Image upload & viewing                  | Anthony Sfeir – 60622 |
 | PDF document upload & viewing           | Ihab Haydaw – 59027   |
 | Reactive Forms & Validators (login/signup) | Anthony Sfeir – 60622 |
 | Settings & theme management             | Ihab Haydaw – 59027   |
-| Account management & password change    | Anthony Sfeir – 60622 |
+| Account management & password change    | Ihab Haydaw – 59027 |
 | Report writing                          | Both students         |
