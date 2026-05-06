@@ -575,11 +575,11 @@
           Watched: <strong>{{ selectedCard?.master_tag_data?.watch_date | date:'mediumDate' }}</strong>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.rating">
-          <span class="view-stars">{{ 'â˜…'.repeat(selectedCard.master_tag_data.rating) }}{{ 'â˜†'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
+          <span class="view-stars">{{ '★'.repeat(selectedCard.master_tag_data.rating) }}{{ '☆'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
           <span>{{ selectedCard.master_tag_data.rating }}/5</span>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.movie_url">
-          <a [href]="selectedCard.master_tag_data.movie_url" target="_blank" class="view-link">ðŸ”— View Movie</a>
+          <a [href]="selectedCard.master_tag_data.movie_url" target="_blank" class="view-link">🔗 View Movie</a>
         </div>
       </div>
 
@@ -590,7 +590,7 @@
           <strong>{{ selectedCard?.master_tag_data?.season_count }} Season(s)</strong>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.series_url">
-          <a [href]="selectedCard.master_tag_data.series_url" target="_blank" class="view-link">ðŸ”— View Series</a>
+          <a [href]="selectedCard.master_tag_data.series_url" target="_blank" class="view-link">🔗 View Series</a>
         </div>
         <div class="episodes-tracker-view">
           <div *ngFor="let season of selectedCard?.master_tag_data?.watched_episodes; let s = index" class="season-tracker-view">
@@ -633,11 +633,11 @@
           Finished: <strong>{{ selectedCard?.master_tag_data?.read_date | date:'mediumDate' }}</strong>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.rating">
-          <span class="view-stars">{{ 'â˜…'.repeat(selectedCard.master_tag_data.rating) }}{{ 'â˜†'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
+          <span class="view-stars">{{ '★'.repeat(selectedCard.master_tag_data.rating) }}{{ '☆'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
           <span>{{ selectedCard.master_tag_data.rating }}/5</span>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.book_url">
-          <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.book_url)" target="_blank" class="view-link">ðŸ”— View Book</a>
+          <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.book_url)" target="_blank" class="view-link">🔗 View Book</a>
         </div>
       </div>
 
@@ -651,21 +651,21 @@
           </label>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.platform">
-          ðŸŽ® Platform: <strong>{{ selectedCard?.master_tag_data?.platform }}</strong>
+          🎮 Platform: <strong>{{ selectedCard?.master_tag_data?.platform }}</strong>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.hours_played">
-          â±ï¸ <strong>{{ selectedCard?.master_tag_data?.hours_played }}h</strong> played
+          ⏱️ <strong>{{ selectedCard?.master_tag_data?.hours_played }}h</strong> played
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.completion_date">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           Completed: <strong>{{ selectedCard?.master_tag_data?.completion_date | date:'mediumDate' }}</strong>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.rating">
-          <span class="view-stars">{{ 'â˜…'.repeat(selectedCard.master_tag_data.rating) }}{{ 'â˜†'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
+          <span class="view-stars">{{ '★'.repeat(selectedCard.master_tag_data.rating) }}{{ '☆'.repeat(5 - selectedCard.master_tag_data.rating) }}</span>
           <span>{{ selectedCard.master_tag_data.rating }}/5</span>
         </div>
         <div class="view-info-row" *ngIf="selectedCard?.master_tag_data?.game_url">
-          <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.game_url)" target="_blank" class="view-link">ðŸ”— View Game</a>
+          <a [href]="ensureHttpProtocol(selectedCard.master_tag_data.game_url)" target="_blank" class="view-link">🔗 View Game</a>
         </div>
       </div>
 
