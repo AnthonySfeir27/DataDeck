@@ -58,6 +58,8 @@ export class CardDashboardComponent implements OnInit {
   tagSearchQuery = '';
   tempSelectedTags: string[] = [];
 
+  cardsPerRow: number = 5;
+
   newCard: Card = createEmptyCard();
   editCard: Card & { id?: string } = createEmptyCard();
 
@@ -84,6 +86,10 @@ export class CardDashboardComponent implements OnInit {
   // =====================================================================
 
   ngOnInit(): void {
+    const savedCpr = localStorage.getItem('datadeck_cards_per_row');
+    if (savedCpr) {
+      this.cardsPerRow = parseInt(savedCpr, 10);
+    }
     this.loadCards();
     this.loadTags();
   }

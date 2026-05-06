@@ -641,7 +641,6 @@ h1 {
 }
 
 .cards-grid {
-  column-width: 280px;
   column-gap: 1.5rem;
 }
 
