@@ -1,9 +1,4 @@
-/**
- * Card Model
- * ----------
- * TypeScript interface for the Card document.
- * Maps to the 'cards' MongoDB collection.
- */
+
 export interface Card {
   id?: string;
   title: string;

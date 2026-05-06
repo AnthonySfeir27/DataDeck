@@ -79,7 +79,7 @@ export class CardDashboardComponent implements OnInit {
     private authService: AuthService,
     private tagsService: TagsService,
     private sanitizer: DomSanitizer
-  ) {}
+  ) { }
 
   // =====================================================================
   //  MAIN FUNCTIONS – Handle flow, validation, routing, error handling
@@ -245,15 +245,6 @@ export class CardDashboardComponent implements OnInit {
     this.editImageUploadMethod = 'url';
   }
 
-  // =====================================================================
-  //  HELPERS – Each serves exactly one purpose
-  // =====================================================================
-
-  // ── Active card accessor (eliminates isEdit branching) ────────────────
-  /**
-   * Returns whichever card form is currently active (new or edit).
-   * All form-manipulation helpers below use this instead of isEdit params.
-   */
   private getActiveCard(): Card {
     return this.isEditingCard ? this.editCard : this.newCard;
   }
@@ -267,7 +258,7 @@ export class CardDashboardComponent implements OnInit {
       filtered = filtered.filter(card => {
         if (this.searchFilter === 'all') {
           return card.title.toLowerCase().includes(query) ||
-                 card.description.toLowerCase().includes(query);
+            card.description.toLowerCase().includes(query);
         } else if (this.searchFilter === 'title') {
           return card.title.toLowerCase().includes(query);
         } else if (this.searchFilter === 'description') {
