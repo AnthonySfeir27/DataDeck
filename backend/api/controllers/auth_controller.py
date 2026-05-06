@@ -15,7 +15,6 @@ from api.models.user_model import (
 
 @api_view(['POST'])
 def signup(request):
-    """Main function: handles user registration flow."""
     username = request.data.get('username')
     email = request.data.get('email')
     password = request.data.get('password')

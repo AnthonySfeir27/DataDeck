@@ -1,26 +1,4 @@
-"""
-Card Model
-----------
-Defines the Card document schema, request parsing, and serialization helpers
-for the 'cards' MongoDB collection.
 
-Fields:
-    _id            : ObjectId      (Primary Key)
-    user_id        : str           (Foreign Key → users._id)
-    title          : str           (required)
-    description    : str
-    master_tag     : str           (card type: note, task, movie, tv_series, book, game)
-    tags           : list[str]     (Many-to-Many → tag names)
-    image_url      : str
-    image_data     : str           (File Image – base64)
-    image_urls     : list[str]
-    urls           : list[str]
-    document_data  : str           (File PDF – base64)
-    document_name  : str
-    master_tag_data: dict          (type-specific nested fields with Date types)
-    created_at     : str           (Date – ISO timestamp)
-    updated_at     : str           (Date – ISO timestamp)
-"""
 
 from datetime import datetime
 from bson import ObjectId
@@ -33,10 +11,6 @@ def get_cards_collection():
     """Returns the MongoDB 'cards' collection."""
     return get_collection(COLLECTION_NAME)
 
-
-# ---------------------------------------------------------------------------
-# Helpers – each serves exactly one purpose
-# ---------------------------------------------------------------------------
 
 def build_card_from_request(request_data: dict) -> dict:
     """

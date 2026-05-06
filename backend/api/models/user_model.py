@@ -1,16 +1,3 @@
-"""
-User Model
-----------
-Defines the User document schema, validation helpers, and query utilities
-for the 'users' MongoDB collection.
-
-Fields:
-    _id       : ObjectId (Primary Key, auto-generated)
-    username  : str      (unique)
-    email     : str      (unique, Email type)
-    password  : str      (SHA-256 hashed)
-"""
-
 import hashlib
 from bson import ObjectId
 from api.db import get_collection
@@ -21,11 +8,6 @@ COLLECTION_NAME = 'users'
 def get_users_collection():
     """Returns the MongoDB 'users' collection."""
     return get_collection(COLLECTION_NAME)
-
-
-# ---------------------------------------------------------------------------
-# Helpers – each serves exactly one purpose
-# ---------------------------------------------------------------------------
 
 def hash_password(plain_password: str) -> str:
     """Hashes a plain-text password with SHA-256."""
