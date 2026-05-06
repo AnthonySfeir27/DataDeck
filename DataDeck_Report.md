@@ -230,7 +230,7 @@ Each student is responsible for at least two MongoDB collections (tables) and de
 
 | Task                                    | Student               |
 |-----------------------------------------|-----------------------|
-| Backend setup (Django, MongoDB connection) | Anthony Sfeir – 60622 |
+| Backend setup (Django, MongoDB connection) | Ihab Haydaw – 59027 |
 | User authentication (login/signup API)  | Anthony Sfeir – 60622 |
 | Cards CRUD API (create, read, update, delete) | Anthony Sfeir – 60622 |
 | Tags API and tag management             | Ihab Haydaw – 59027   |
